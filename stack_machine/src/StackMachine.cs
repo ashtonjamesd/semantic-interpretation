@@ -23,8 +23,13 @@ internal sealed class StackMachine {
             else if (token.Type == TokenType.Read) {
                 ExecuteRead();
             }
+            else if (token.Type == TokenType.Jump) {
+                ExecuteJump();
+            }
 
             Current++;
+
+            Thread.Sleep(200);
         }
     }
 
@@ -47,5 +52,14 @@ internal sealed class StackMachine {
         int arg = int.Parse(input);
 
         Stack.Push(arg);
+    }
+
+    private void ExecuteJump() {
+        Current++; // advance past the 'jump'
+
+        var labelName = Tokens[Current].Lexeme;
+        var labelIndex = Tokens.FindIndex(0, Tokens.Count, x => x.Lexeme == labelName);
+
+        Current = labelIndex;
     }
 }

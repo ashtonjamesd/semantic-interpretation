@@ -12,6 +12,7 @@ internal sealed class Lexer {
         {"pop", TokenType.Pop},
         {"print", TokenType.Print},
         {"read", TokenType.Read},
+        {"jump", TokenType.Jump},
     };
 
     internal List<Token> Tokenize() {
@@ -23,6 +24,10 @@ internal sealed class Lexer {
 
             var token = ParseToken();
             Tokens.Add(token);
+
+            if (token.Type is TokenType.Bad) {
+                return Tokens;
+            }
 
             Current++;
         }
@@ -40,28 +45,39 @@ internal sealed class Lexer {
             return ParseNumeric();
         }
         else {
-            Console.WriteLine($"Invalid token: '{token}'");
-            return new(token.ToString(), TokenType.Bad);
+            return Error($"invalid token: '{token}'");
         }
     }
 
     private Token ParseIdentifier() {
         int start = Current;
-
         while (Current < Source.Length && char.IsLetter(Source[Current]))
             Current++;
 
         var lexeme = Source.Substring(start, Current - start);
-        return new(lexeme, Keywords[lexeme]);
+
+        if (Keywords.ContainsKey(lexeme)) {
+            return new(lexeme, Keywords[lexeme]);
+        }
+
+        if (Current < Source.Length && Source[Current] != ':') {
+            return Error("expected ':' after label definition");
+        }
+
+        return new(lexeme, TokenType.Label);
     }
 
     private Token ParseNumeric() {
         int start = Current;
-
         while (Current < Source.Length && char.IsDigit(Source[Current]))
             Current++;
 
         var lexeme = Source.Substring(start, Current - start);
         return new(lexeme, TokenType.Numeric);
+    }
+
+    private static Token Error(string message) {
+        Console.WriteLine(message);
+        return new("", TokenType.Bad);
     }
 }

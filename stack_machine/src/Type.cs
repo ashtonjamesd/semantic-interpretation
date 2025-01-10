@@ -4,5 +4,7 @@ internal enum TokenType {
     Print,
     Read,
     Numeric,
+    Label,
+    Jump,
     Bad
 }

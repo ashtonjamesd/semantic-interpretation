@@ -1,11 +1,9 @@
-push 5
-push 4
-push 3
-push 2
 push 1
 
-print pop
-print pop
-print pop
-print pop
-print pop
+main:
+  push 0
+  print
+  pop
+  print
+
+juap main
