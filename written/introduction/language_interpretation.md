@@ -1,0 +1,7 @@
+# Language Interpretation
+
+It is important to realise that computers do not “know” anything. They simply do what they are told in a very static, boring way. Because of this, we have to come up with creative methods to work with computers effectively. The complexity of a computer at the CPU level is very impractical to work with and would require a lot of nonessential knowledge of how the computer operates at such a level. To combat this, we created programming languages and software abstractions that allow us to interact with computers more intuitively. Language interpreters and compilers are examples of such abstractions.
+
+A language interpreter is a program written to read and execute the source code of another language line-by-line. The fundamental difference between that and a compiler is that compilers generate machine code, whereas an interpreter executes the program in another program. We won’t cover too much on language compilers as that is not the primary focus of this book. The interpreter reads the source code it is given and converts it into a collection of tokens through a process called lexical analysis (or tokenization). Each token holds a specific, meaningful piece of data the interpreter is going to use - this will be explained in more detail later on.
+
+Python, written in C, is an example of a language that is interpreted by another. Ruby and JavaScript are also examples of interpreted languages.
