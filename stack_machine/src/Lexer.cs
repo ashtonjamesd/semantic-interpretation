@@ -13,6 +13,8 @@ internal sealed class Lexer {
         {"print", TokenType.Print},
         {"read", TokenType.Read},
         {"jump", TokenType.Jump},
+        {"add", TokenType.Add},
+        {"sub", TokenType.Sub},
     };
 
     internal List<Token> Tokenize() {
@@ -56,15 +58,15 @@ internal sealed class Lexer {
 
         var lexeme = Source.Substring(start, Current - start);
 
-        if (Keywords.ContainsKey(lexeme)) {
-            return new(lexeme, Keywords[lexeme]);
+        if (Keywords.TryGetValue(lexeme, out var type)) {
+            return new(lexeme, type);
         }
 
-        if (Current < Source.Length && Source[Current] != ':') {
-            return Error("expected ':' after label definition");
+        if (Current < Source.Length && Source[Current] == ':') {
+            return new(lexeme, TokenType.Label);
         }
 
-        return new(lexeme, TokenType.Label);
+        return new(lexeme, TokenType.Identifier);
     }
 
     private Token ParseNumeric() {

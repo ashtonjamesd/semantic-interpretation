@@ -3,8 +3,11 @@ internal enum TokenType {
     Pop,
     Print,
     Read,
-    Numeric,
-    Label,
+    Add,
+    Sub,
     Jump,
+    Label,
+    Identifier,
+    Numeric,
     Bad
 }

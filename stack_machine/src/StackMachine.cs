@@ -12,17 +12,20 @@ internal sealed class StackMachine {
             {TokenType.Print, ExecutePrint},
             {TokenType.Read, ExecuteRead},
             {TokenType.Jump, ExecuteJump},
+            {TokenType.Add, ExecuteAdd},
+            {TokenType.Sub, ExecuteSub},
         };
     }
 
-    private readonly Dictionary<TokenType, Action> Registry = new();
+    private readonly Dictionary<TokenType, Func<bool>> Registry = new();
 
     internal bool Execute() {
         while (InstructionPointer < Tokens.Count) {
             var token = Tokens[InstructionPointer];
 
             if (Registry.TryGetValue(token.Type, out var action)) {
-                action();
+                var result = action();
+                if (!result) return false;
             } 
             else if (token.Type is not TokenType.Label) {
                 return Error($"undefined identifier '{token.Lexeme}'");
@@ -32,7 +35,7 @@ internal sealed class StackMachine {
             Thread.Sleep(200);
         }
 
-        return false;
+        return true;
     }
 
     private static bool Error(string message) {
@@ -40,34 +43,91 @@ internal sealed class StackMachine {
         return false;
     }
 
-    private void ExecutePush() {
+    private bool ExecutePush() {
+        if (InstructionPointer >= Tokens.Count) {
+            return Error("expected argument after 'push'");
+        }
+
         var arg = Tokens[++InstructionPointer].Lexeme;
-        Stack.Push(int.Parse(arg));
+        if (!int.TryParse(arg, out var argInt)) {
+            return Error("expected numeric argument after 'push'");
+        }
+
+        Stack.Push(argInt);
+        return true;
     }
 
-    private void ExecutePop() {
+    private bool ExecutePop() {
+        if (Stack.Count == 0) {
+            return Error("attempted to pop value off an empty stack");
+        }
+
         Stack.Pop();
+        return true;
     }
 
-    private void ExecutePrint() {
-        var item = Stack.Peek();
-        Console.WriteLine(item);
+    private bool ExecutePrint() {
+        if (Stack.Count == 0) {
+            return Error("attempted to print value from empty stack");
+        }
+
+        Console.WriteLine(Stack.Peek());
+        return true;
     }
 
-    private void ExecuteRead() {
+    private bool ExecuteRead() {
         var input = Console.ReadLine();
-        int arg = int.Parse(input);
+        if (!int.TryParse(input, out var argInt)) {
+            return Error("expected numeric argument for 'read'");
+        }
 
-        Stack.Push(arg);
+        Stack.Push(argInt);
+        return true;
     }
 
-    private void ExecuteJump() {
-        InstructionPointer++; // advance past the 'jump'
+    private bool ExecuteJump() {
+        if (InstructionPointer >= Tokens.Count) {
+            return Error("expected numeric argument after 'push'");
+        }
+
+        InstructionPointer++;
 
         var labelName = Tokens[InstructionPointer].Lexeme;
         var labelIndex = Tokens
             .FindIndex(0, Tokens.Count, x => x.Lexeme == labelName && x.Type is TokenType.Label);
 
+        if (labelIndex == -1) {
+            return Error($"undefined label '{labelName}'");
+        }
+
         InstructionPointer = labelIndex;
+
+        return true;
+    }
+
+    private bool ExecuteAdd() {
+        if (Stack.Count < 2) {
+            return Error("not enough values on the stack to perform 'add'");
+        }
+
+        var a = Stack.Pop();
+        var b = Stack.Pop();
+
+        Stack.Push(a + b);
+
+        return true;
+    }
+
+    private bool ExecuteSub() {
+        if (Stack.Count < 2) {
+            return Error("not enough values on the stack to perform 'sub'");
+        }
+
+        var a = Stack.Pop();
+        var b = Stack.Pop();
+
+        Stack.Push(b - a);
+
+        return true;
     }
 }

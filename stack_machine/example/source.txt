@@ -1,9 +1,4 @@
-push 1
-
-main:
-  push 0
-  print
-  pop
-  print
-
-jump main
+push 10
+push 2
+add
+print

@@ -22,6 +22,13 @@
             Console.WriteLine($"{t.Type}: '{t.Lexeme}'");
 
         var machine = new StackMachine(tokens);
-        machine.Execute();
+        var result = machine.Execute();
+
+        if (!result) {
+            Console.WriteLine("Program execution finished with errors");
+            return;
+        }
+
+        Console.WriteLine("Program execution finished");
     }
 }
