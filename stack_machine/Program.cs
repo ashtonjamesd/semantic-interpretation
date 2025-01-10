@@ -3,7 +3,7 @@
 internal abstract class Program {
     static void Main(string[] args) {
         if (args.Length != 1) {
-            Console.WriteLine("expected source file path as a command line argument.");
+            Console.WriteLine("expected source file path as a single command line argument.");
             return;
         }
 
@@ -16,7 +16,7 @@ internal abstract class Program {
 
         var lexer = new Lexer(source, isDebug: true);
         var tokens = lexer.Tokenize();
-        if (tokens.Last().Type is TokenType.Bad) {
+        if (tokens.Any(t => t.Type is TokenType.Bad)) {
             return;
         }
 
@@ -29,5 +29,9 @@ internal abstract class Program {
         }
 
         Console.WriteLine("Program execution finished");
+    }
+
+    public static void RunStackMachine() {
+        
     }
 }

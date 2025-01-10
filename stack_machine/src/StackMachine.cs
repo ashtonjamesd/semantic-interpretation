@@ -1,8 +1,9 @@
 internal sealed class StackMachine {
     private List<Token> Tokens { get; set; }
     private int InstructionPointer = 0;
-
     private Stack<int> Stack = new();
+    private readonly Dictionary<TokenType, Func<bool>> Registry = new();
+
     public StackMachine(List<Token> tokens) {
         Tokens = tokens;
 
@@ -17,8 +18,6 @@ internal sealed class StackMachine {
         };
     }
 
-    private readonly Dictionary<TokenType, Func<bool>> Registry = new();
-
     internal bool Execute() {
         while (Tokens[InstructionPointer].Type is not TokenType.Eof) {
             var token = Tokens[InstructionPointer];
@@ -32,7 +31,7 @@ internal sealed class StackMachine {
             }
 
             InstructionPointer++;
-            Thread.Sleep(200);
+            Thread.Sleep(50);
         }
 
         return true;
@@ -127,7 +126,7 @@ internal sealed class StackMachine {
 
     private bool ExecuteJumpWhen() {
         InstructionPointer--;
-        var identifier = Tokens[InstructionPointer++].Lexeme;
+        var label = Tokens[InstructionPointer++].Lexeme;
 
         var when = Tokens[InstructionPointer++];
         if (when.Type is not TokenType.When) {
@@ -137,7 +136,7 @@ internal sealed class StackMachine {
         var number = int.Parse(Tokens[InstructionPointer].Lexeme);
 
         if (number == Stack.Peek()) {
-            JumpTo(identifier);
+            JumpTo(label);
         }
 
         return true;
@@ -152,7 +151,6 @@ internal sealed class StackMachine {
         }
 
         InstructionPointer = labelIndex;
-
         return true;
     }
 }

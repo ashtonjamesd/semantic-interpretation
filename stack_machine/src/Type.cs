@@ -1,4 +1,4 @@
-internal enum TokenType {
+public enum TokenType {
     Push,
     Pop,
     Print,

@@ -1,10 +1,10 @@
-internal sealed class Lexer {
+public sealed class Lexer {
     private List<Token> Tokens = new();
     private int Current = 0;
     private string Source;
     private readonly bool IsDebug;
 
-    public Lexer(string source, bool isDebug) {
+    public Lexer(string source, bool isDebug = false) {
         Source = source;
         IsDebug = isDebug;
     }
@@ -20,7 +20,7 @@ internal sealed class Lexer {
         {"when", TokenType.When},
     };
 
-    internal List<Token> Tokenize() {
+    public List<Token> Tokenize() {
         while (!IsEnd()) {
             if (char.IsWhiteSpace(Source[Current])) {
                 Current++;
@@ -49,15 +49,11 @@ internal sealed class Lexer {
     private Token ParseToken() {
         var token = Source[Current];
 
-        if (char.IsLetter(token)) {
-            return ParseIdentifier();
-        } 
-        else if (char.IsDigit(token)) {
-            return ParseNumeric();
-        }
-        else {
-            return Error($"invalid token: '{token}'");
-        }
+        return Source[Current] switch {
+            _ when char.IsLetter(token) => ParseIdentifier(),
+            _ when char.IsDigit(token) => ParseNumeric(),
+            _ => Error($"invalid token: '{token}'")
+        };
     }
 
     private Token ParseIdentifier() {
@@ -65,13 +61,14 @@ internal sealed class Lexer {
         while (!IsEnd() && (Source[Current] is '_' || char.IsLetter(Source[Current])))
             Current++;
 
-        var lexeme = Source.Substring(start, Current - start);
+        var lexeme = Source[start..Current];
+        Console.WriteLine(lexeme);
 
         if (Keywords.TryGetValue(lexeme, out var type)) {
             return new(lexeme, type);
         }
 
-        if (!IsEnd() && Source[Current] == ':') {
+        if (!IsEnd() && Source[Current] is ':') {
             return new(lexeme, TokenType.Label);
         }
 
@@ -83,7 +80,7 @@ internal sealed class Lexer {
         while (!IsEnd() && char.IsDigit(Source[Current]))
             Current++;
 
-        var lexeme = Source.Substring(start, Current - start);
+        var lexeme = Source[start..Current];
         return new(lexeme, TokenType.Numeric);
     }
 
@@ -93,8 +90,9 @@ internal sealed class Lexer {
     }
 
     private void PrintLexer() {
+        Console.WriteLine("\nTokens:");
         foreach (var token in Tokens) {
-            Console.WriteLine($"{token.Type}: {token.Lexeme}");
+            Console.WriteLine($"  {token.Type}: {token.Lexeme}");
         }
     }
 
