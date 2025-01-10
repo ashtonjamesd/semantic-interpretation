@@ -5,32 +5,39 @@ internal sealed class StackMachine {
     private Stack<int> Stack = new();
     public StackMachine(List<Token> tokens) {
         Tokens = tokens;
+
+        Registry = new() {
+            {TokenType.Push, ExecutePush},
+            {TokenType.Pop, ExecutePop},
+            {TokenType.Print, ExecutePrint},
+            {TokenType.Read, ExecuteRead},
+            {TokenType.Jump, ExecuteJump},
+        };
     }
 
-    internal void Execute() {
+    private readonly Dictionary<TokenType, Action> Registry = new();
+
+    internal bool Execute() {
         while (InstructionPointer < Tokens.Count) {
             var token = Tokens[InstructionPointer];
 
-            if (token.Type == TokenType.Push) {
-                ExecutePush();
-            }
-            else if (token.Type == TokenType.Pop) {
-                ExecutePop();
-            }
-            else if (token.Type == TokenType.Print) {
-                ExecutePrint();
-            }
-            else if (token.Type == TokenType.Read) {
-                ExecuteRead();
-            }
-            else if (token.Type == TokenType.Jump) {
-                ExecuteJump();
+            if (Registry.TryGetValue(token.Type, out var action)) {
+                action();
+            } 
+            else if (token.Type is not TokenType.Label) {
+                return Error($"undefined identifier '{token.Lexeme}'");
             }
 
             InstructionPointer++;
-
             Thread.Sleep(200);
         }
+
+        return false;
+    }
+
+    private static bool Error(string message) {
+        Console.WriteLine($"Interpreter Error: {message}");
+        return false;
     }
 
     private void ExecutePush() {
@@ -58,7 +65,8 @@ internal sealed class StackMachine {
         InstructionPointer++; // advance past the 'jump'
 
         var labelName = Tokens[InstructionPointer].Lexeme;
-        var labelIndex = Tokens.FindIndex(0, Tokens.Count, x => x.Lexeme == labelName);
+        var labelIndex = Tokens
+            .FindIndex(0, Tokens.Count, x => x.Lexeme == labelName && x.Type is TokenType.Label);
 
         InstructionPointer = labelIndex;
     }

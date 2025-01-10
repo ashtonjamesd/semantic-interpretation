@@ -6,4 +6,4 @@ main:
   pop
   print
 
-juap main
+jump main
