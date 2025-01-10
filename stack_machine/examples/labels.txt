@@ -1,0 +1,13 @@
+push 0
+
+main:
+  print
+  jump main_if_zero_or_one
+  jump end
+
+main_if_zero_or_one:
+  jump main when 0
+  jump main when 1
+
+end:
+  print

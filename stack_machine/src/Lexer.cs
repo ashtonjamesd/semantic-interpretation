@@ -2,9 +2,11 @@ internal sealed class Lexer {
     private List<Token> Tokens = new();
     private int Current = 0;
     private string Source;
+    private readonly bool IsDebug;
 
-    public Lexer(string source) {
+    public Lexer(string source, bool isDebug) {
         Source = source;
+        IsDebug = isDebug;
     }
 
     private readonly Dictionary<string, TokenType> Keywords = new() {
@@ -15,10 +17,11 @@ internal sealed class Lexer {
         {"jump", TokenType.Jump},
         {"add", TokenType.Add},
         {"sub", TokenType.Sub},
+        {"when", TokenType.When},
     };
 
     internal List<Token> Tokenize() {
-        while (Current < Source.Length) {
+        while (!IsEnd()) {
             if (char.IsWhiteSpace(Source[Current])) {
                 Current++;
                 continue;
@@ -32,6 +35,12 @@ internal sealed class Lexer {
             }
 
             Current++;
+        }
+
+        Tokens.Add(new("", TokenType.Eof));
+
+        if (IsDebug) {
+            PrintLexer();
         }
 
         return Tokens;
@@ -53,7 +62,7 @@ internal sealed class Lexer {
 
     private Token ParseIdentifier() {
         int start = Current;
-        while (Current < Source.Length && char.IsLetter(Source[Current]))
+        while (!IsEnd() && (Source[Current] is '_' || char.IsLetter(Source[Current])))
             Current++;
 
         var lexeme = Source.Substring(start, Current - start);
@@ -62,7 +71,7 @@ internal sealed class Lexer {
             return new(lexeme, type);
         }
 
-        if (Current < Source.Length && Source[Current] == ':') {
+        if (!IsEnd() && Source[Current] == ':') {
             return new(lexeme, TokenType.Label);
         }
 
@@ -71,7 +80,7 @@ internal sealed class Lexer {
 
     private Token ParseNumeric() {
         int start = Current;
-        while (Current < Source.Length && char.IsDigit(Source[Current]))
+        while (!IsEnd() && char.IsDigit(Source[Current]))
             Current++;
 
         var lexeme = Source.Substring(start, Current - start);
@@ -81,5 +90,15 @@ internal sealed class Lexer {
     private static Token Error(string message) {
         Console.WriteLine(message);
         return new("", TokenType.Bad);
+    }
+
+    private void PrintLexer() {
+        foreach (var token in Tokens) {
+            Console.WriteLine($"{token.Type}: {token.Lexeme}");
+        }
+    }
+
+    private bool IsEnd() {
+        return Current >= Source.Length;
     }
 }

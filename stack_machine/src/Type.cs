@@ -7,7 +7,9 @@ internal enum TokenType {
     Sub,
     Jump,
     Label,
+    When,
     Identifier,
     Numeric,
-    Bad
+    Bad,
+    Eof
 }

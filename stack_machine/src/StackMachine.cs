@@ -20,7 +20,7 @@ internal sealed class StackMachine {
     private readonly Dictionary<TokenType, Func<bool>> Registry = new();
 
     internal bool Execute() {
-        while (InstructionPointer < Tokens.Count) {
+        while (Tokens[InstructionPointer].Type is not TokenType.Eof) {
             var token = Tokens[InstructionPointer];
 
             if (Registry.TryGetValue(token.Type, out var action)) {
@@ -87,22 +87,16 @@ internal sealed class StackMachine {
 
     private bool ExecuteJump() {
         if (InstructionPointer >= Tokens.Count) {
-            return Error("expected numeric argument after 'push'");
+            return Error("expected identifier argument after 'jump'");
         }
 
-        InstructionPointer++;
-
-        var labelName = Tokens[InstructionPointer].Lexeme;
-        var labelIndex = Tokens
-            .FindIndex(0, Tokens.Count, x => x.Lexeme == labelName && x.Type is TokenType.Label);
-
-        if (labelIndex == -1) {
-            return Error($"undefined label '{labelName}'");
+        InstructionPointer += 2;
+        if (InstructionPointer < Tokens.Count && Tokens[InstructionPointer].Type is TokenType.When) {
+            return ExecuteJumpWhen();
         }
 
-        InstructionPointer = labelIndex;
-
-        return true;
+        InstructionPointer--;
+        return JumpTo(Tokens[InstructionPointer].Lexeme);
     }
 
     private bool ExecuteAdd() {
@@ -127,6 +121,37 @@ internal sealed class StackMachine {
         var b = Stack.Pop();
 
         Stack.Push(b - a);
+
+        return true;
+    }
+
+    private bool ExecuteJumpWhen() {
+        InstructionPointer--;
+        var identifier = Tokens[InstructionPointer++].Lexeme;
+
+        var when = Tokens[InstructionPointer++];
+        if (when.Type is not TokenType.When) {
+            return Error("jump 'when' expected");
+        }
+
+        var number = int.Parse(Tokens[InstructionPointer].Lexeme);
+
+        if (number == Stack.Peek()) {
+            JumpTo(identifier);
+        }
+
+        return true;
+    }
+
+    private bool JumpTo(string label) {
+        var labelIndex = Tokens
+            .FindIndex(0, Tokens.Count, x => x.Lexeme == label && x.Type is TokenType.Label);
+
+        if (labelIndex == -1) {
+            return Error($"undefined label '{label}'");
+        }
+
+        InstructionPointer = labelIndex;
 
         return true;
     }
