@@ -1,6 +1,6 @@
 internal sealed class StackMachine {
     private List<Token> Tokens { get; set; }
-    private int Current = 0;
+    private int InstructionPointer = 0;
 
     private Stack<int> Stack = new();
     public StackMachine(List<Token> tokens) {
@@ -8,8 +8,8 @@ internal sealed class StackMachine {
     }
 
     internal void Execute() {
-        while (Current < Tokens.Count) {
-            var token = Tokens[Current];
+        while (InstructionPointer < Tokens.Count) {
+            var token = Tokens[InstructionPointer];
 
             if (token.Type == TokenType.Push) {
                 ExecutePush();
@@ -27,14 +27,14 @@ internal sealed class StackMachine {
                 ExecuteJump();
             }
 
-            Current++;
+            InstructionPointer++;
 
             Thread.Sleep(200);
         }
     }
 
     private void ExecutePush() {
-        var arg = Tokens[++Current].Lexeme;
+        var arg = Tokens[++InstructionPointer].Lexeme;
         Stack.Push(int.Parse(arg));
     }
 
@@ -55,11 +55,11 @@ internal sealed class StackMachine {
     }
 
     private void ExecuteJump() {
-        Current++; // advance past the 'jump'
+        InstructionPointer++; // advance past the 'jump'
 
-        var labelName = Tokens[Current].Lexeme;
+        var labelName = Tokens[InstructionPointer].Lexeme;
         var labelIndex = Tokens.FindIndex(0, Tokens.Count, x => x.Lexeme == labelName);
 
-        Current = labelIndex;
+        InstructionPointer = labelIndex;
     }
 }
