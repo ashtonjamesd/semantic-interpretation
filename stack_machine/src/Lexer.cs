@@ -2,6 +2,7 @@ public class Lexer {
     private readonly List<Token> Tokens = new();
     private readonly string Source;
     private int Current = 0;
+    private int CurrentLine = 1;
 
     private readonly Dictionary<string, TokenType> Keywords = new() {
         ["push"] = TokenType.Push,
@@ -19,34 +20,55 @@ public class Lexer {
 
     public List<Token> Tokenize() {
         while (Current < Source.Length) {
-            while (char.IsWhiteSpace(Source[Current])) {
-                Current++;
-                continue;
-            }
+            SkipWhitespace();
+            if (Current >= Source.Length) 
+                break;
 
             var token = ParseToken();
             Tokens.Add(token);
 
+            if (token.Type is TokenType.BadToken) {
+                return Tokens;
+            }
+
             Current++;
         }
 
-        Tokens.Add(new("", TokenType.Eof));
+        Tokens.Add(new("", TokenType.Eof, CurrentLine));
 
         PrintLexer();
         return Tokens;
     }
 
-    private Token ParseToken() {
-        if (char.IsLetter(Source[Current])) {
-            return ParseIdentifier();
+    private void SkipWhitespace() {
+        while (Current < Source.Length && char.IsWhiteSpace(Source[Current])) {
+
+            if (Source[Current] is '\n') {
+                CurrentLine++;
+            }
+
+            Current++;
+            continue;
         }
-        else if (char.IsDigit(Source[Current])) {
-            return ParseNumeric();
-        }
-        
-        return new("", TokenType.BadToken);
     }
 
+    private Token Error(string message) {
+        Console.WriteLine($"Lexer Error: {message} on line {CurrentLine}");
+        return new("", TokenType.BadToken, CurrentLine);
+    }
+
+    private Token ParseToken() {
+        var token = Source[Current];
+
+        if (char.IsLetter(token)) {
+            return ParseIdentifier();
+        }
+        else if (char.IsDigit(token)) {
+            return ParseNumeric();
+        }
+
+        return Error($"invalid character '{token}'");
+    }
 
     private Token ParseIdentifier() {
         int start = Current;
@@ -55,24 +77,24 @@ public class Lexer {
         var value = Source[start..Current];
 
         if (Keywords.TryGetValue(value, out var keywordType)) {
-            return new(value, keywordType);
+            return new(value, keywordType, CurrentLine);
         }
 
         if (Current < Source.Length && Source[Current] is ':') {
-            return new(value, TokenType.Label);
+            return new(value, TokenType.Label, CurrentLine);
         }
 
-        return new(value, TokenType.Identifier);
+        return new(value, TokenType.Identifier, CurrentLine);
     }
 
     private Token ParseNumeric() {
-    int start = Current;
-    while (Current < Source.Length && char.IsDigit(Source[Current]))
-        Current++;
+        int start = Current;
+        while (Current < Source.Length && char.IsDigit(Source[Current]))
+            Current++;
 
-    var value = Source[start..Current];
-    return new(value, TokenType.Numeric);
-}
+        var value = Source[start..Current];
+        return new(value, TokenType.Numeric, CurrentLine);
+    }
 
     private void PrintLexer() {
         Console.WriteLine($"Source: {Source}");

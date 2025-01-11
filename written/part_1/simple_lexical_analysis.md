@@ -92,10 +92,17 @@ public List<Token> Tokenize() {
 We also must remember to account for the whitespace the lexer will encounter. Another loop at the beginning of the top-level one can take care of this.
 
 ```
-while (char.IsWhiteSpace(Source[Current])) {
+while (Current < Source.Length && char.IsWhiteSpace(Source[Current])) {
     Current++;
     continue;
 }
+```
+
+Since the incrementing of the character pointer can lead us up to the end of the source, we need an additional check to break early.
+
+```
+if (Current >= Source.Length) 
+    break;
 ```
 
 Currently, we are only parsing identifiers so we will assume every other token encountered is a 'BadToken'.

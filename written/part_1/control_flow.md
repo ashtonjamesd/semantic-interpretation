@@ -103,18 +103,29 @@ In our language, conditional jumps check the value currently at the top of the s
 
 First, we add a new 'When' keyword to the lexer. Since the stack machine will encounter the 'Jump' token first, it will still call the ExecuteJump method. We can define another method, 'ExecuteJumpWhen', that will handle the conditional logic.
 
-```
-private bool ExecuteJumpWhen() {
-    InstructionPointer--;
-    var label = Tokens[InstructionPointer++].Value;
+Next, we need to update the ExecuteJump method to handle the case where a 'When' token appears after the label. To do this, we look ahead two tokens and check if a When token is present.
 
-    var when = Tokens[InstructionPointer++];
-    if (when.Type is not TokenType.When) {
-        return Error("jump 'when' expected");
+```
+private bool ExecuteJump() {
+    // ...
+
+    InstructionPointer += 2;
+    if (InstructionPointer < Tokens.Count && Tokens[InstructionPointer].Type is TokenType.When) {
+        return ExecuteJumpWhen();
     }
 
-    var number = int.Parse(Tokens[InstructionPointer].Value);
+    InstructionPointer--;
+    return JumpTo(Tokens[InstructionPointer].Value);
+}
+```
 
+The label token is retrieved from the value of the instruction pointer minus one. Then we increment the pointer so that it is pointing at the numeric argument passed to the conditional.
+
+```
+private bool ExecuteJumpWhen() {
+    var label = Tokens[InstructionPointer++ - 1].Value;
+    
+    var number = int.Parse(Tokens[InstructionPointer].Value);
     if (number == Stack.Peek()) {
         return JumpTo(label);
     }
@@ -140,6 +151,15 @@ As expected, the jump statement is skipped and both print statements are execute
 ```
 1
 1
+```
+
+The output of the above program but with 'when 1' instead would output the number '1' infinitely.
+
+```
+1
+1
+1
+...
 ```
 
 The interpreter is working pretty nicely, however the code has been left in a purposefully vulnerable state and attention needs to be drawn to how it handles exceptions. In the next section, we will see what amendments we can make.

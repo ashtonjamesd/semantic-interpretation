@@ -37,8 +37,10 @@ internal sealed class StackMachine {
         return true;
     }
 
-    private static bool Error(string message) {
-        Console.WriteLine($"Interpreter Error: {message}");
+    private bool Error(string message) {
+        var line = Tokens[InstructionPointer].Line;
+        
+        Console.WriteLine($"Interpreter Error: {message} on line {line}");
         return false;
     }
 
@@ -117,16 +119,9 @@ internal sealed class StackMachine {
     }
 
     private bool ExecuteJumpWhen() {
-        InstructionPointer--;
-        var label = Tokens[InstructionPointer++].Value;
-
-        var when = Tokens[InstructionPointer++];
-        if (when.Type is not TokenType.When) {
-            return Error("jump 'when' expected");
-        }
+        var label = Tokens[InstructionPointer++ - 1].Value;
 
         var number = int.Parse(Tokens[InstructionPointer].Value);
-
         if (number == Stack.Peek()) {
             return JumpTo(label);
         }
