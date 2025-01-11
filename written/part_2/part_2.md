@@ -1,4 +1,4 @@
-## Bytecode Interpreter
+## Part 2 - Bytecode Interpreter
 
 Interpreters play a crucial role in executing source code. While many modern programming languages compile to machine code, some opt for a middle-ground approach and compile into an intermediate representation known as bytecode.
 
