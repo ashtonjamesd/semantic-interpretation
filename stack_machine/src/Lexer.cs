@@ -1,25 +1,3 @@
-public sealed class Token {
-    public string Value { get; set; }
-    public TokenType Type { get; set; }
-
-    public Token(string value, TokenType type) {
-        Value = value;
-        Type = type;
-    }
-}
-
-public enum TokenType {
-    Push,
-    Pop,
-    Numeric,
-    Add,
-    Sub,
-    Identifier,
-    BadToken,
-    Print,
-    Eof
-}
-
 public class Lexer {
     private readonly List<Token> Tokens = new();
     private readonly string Source;
@@ -31,6 +9,8 @@ public class Lexer {
         ["print"] = TokenType.Print,
         ["add"] = TokenType.Add,
         ["sub"] = TokenType.Sub,
+        ["jump"] = TokenType.Jump,
+        ["when"] = TokenType.When,
     };
 
     public Lexer(string source) {
@@ -60,9 +40,10 @@ public class Lexer {
         if (char.IsLetter(Source[Current])) {
             return ParseIdentifier();
         }
-else if (char.IsDigit(Source[Current])) {
-    return ParseNumeric();
-}
+        else if (char.IsDigit(Source[Current])) {
+            return ParseNumeric();
+        }
+        
         return new("", TokenType.BadToken);
     }
 
@@ -73,9 +54,14 @@ else if (char.IsDigit(Source[Current])) {
             Current++;
         var value = Source[start..Current];
 
-            if (Keywords.TryGetValue(value, out var keywordType)) {
-    return new(value, keywordType);
-}
+        if (Keywords.TryGetValue(value, out var keywordType)) {
+            return new(value, keywordType);
+        }
+
+        if (Current < Source.Length && Source[Current] is ':') {
+            return new(value, TokenType.Label);
+        }
+
         return new(value, TokenType.Identifier);
     }
 

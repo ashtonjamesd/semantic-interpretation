@@ -1,4 +1,7 @@
-push 18
-push 5
-sub
+push 1
+
+main:
+  print
+  jump main when 1
+
 print

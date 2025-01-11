@@ -246,3 +246,5 @@ push 5
 sub
 print // 13
 ```
+
+The next part of our stack interpreter involves creating control flow for our programs. Control flow will allow us to loop and reuse code, as well as terminate the execution when necessary.

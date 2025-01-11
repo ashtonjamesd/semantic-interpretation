@@ -12,6 +12,7 @@ internal sealed class StackMachine {
             [TokenType.Print] = ExecutePrint,
             [TokenType.Add] = ExecuteAdd,
             [TokenType.Sub] = ExecuteSub,
+            [TokenType.Jump] = ExecuteJump
         };
     }
 
@@ -26,7 +27,7 @@ internal sealed class StackMachine {
                 var result = method!();
                 if (!result) return false;
             }
-            else {
+            else if (token.Type is not TokenType.Label) {
                 return Error($"unknown identifier '{token.Value}'");
             }
 
@@ -99,5 +100,48 @@ internal sealed class StackMachine {
         Stack.Push(b - a);
 
         return true;
+    }
+
+    private bool ExecuteJump() {
+        if (InstructionPointer >= Tokens.Count) {
+            return Error("expected identifier argument after 'jump'");
+        }
+
+        InstructionPointer += 2;
+        if (InstructionPointer < Tokens.Count && Tokens[InstructionPointer].Type is TokenType.When) {
+            return ExecuteJumpWhen();
+        }
+
+        InstructionPointer--;
+        return JumpTo(Tokens[InstructionPointer].Value);
+    }
+
+    private bool ExecuteJumpWhen() {
+        InstructionPointer--;
+        var label = Tokens[InstructionPointer++].Value;
+
+        var when = Tokens[InstructionPointer++];
+        if (when.Type is not TokenType.When) {
+            return Error("jump 'when' expected");
+        }
+
+        var number = int.Parse(Tokens[InstructionPointer].Value);
+
+        if (number == Stack.Peek()) {
+            return JumpTo(label);
+        }
+
+        return true;
+    }
+
+    private bool JumpTo(string label) {
+        for (int i = 0; i < Tokens.Count; i++) {
+            if (Tokens[i].Type is TokenType.Label && Tokens[i].Value == label) {
+                InstructionPointer = i;
+                return true;
+            }
+        }
+
+        return Error($"undefined label '{label}'");
     }
 }
