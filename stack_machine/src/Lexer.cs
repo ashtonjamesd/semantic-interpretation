@@ -1,28 +1,38 @@
-public sealed class Lexer {
-    private List<Token> Tokens = new();
-    private int Current = 0;
-    private string Source;
-    private readonly bool IsDebug;
+public sealed class Token {
+    public string Value { get; set; }
+    public TokenType Type { get; set; }
 
-    public Lexer(string source, bool isDebug = false) {
-        Source = source;
-        IsDebug = isDebug;
+    public Token(string value, TokenType type) {
+        Value = value;
+        Type = type;
     }
+}
+
+public enum TokenType {
+    Push,
+    Pop,
+    Numeric,
+    Identifier,
+    BadToken
+}
+
+public class Lexer {
+    private readonly List<Token> Tokens = new();
+    private readonly string Source;
+    private int Current = 0;
 
     private readonly Dictionary<string, TokenType> Keywords = new() {
-        {"push", TokenType.Push},
-        {"pop", TokenType.Pop},
-        {"print", TokenType.Print},
-        {"read", TokenType.Read},
-        {"jump", TokenType.Jump},
-        {"add", TokenType.Add},
-        {"sub", TokenType.Sub},
-        {"when", TokenType.When},
+        ["push"] = TokenType.Push,
+        ["pop"] = TokenType.Pop,
     };
 
+    public Lexer(string source) {
+        Source = source;
+    }
+
     public List<Token> Tokenize() {
-        while (!IsEnd()) {
-            if (char.IsWhiteSpace(Source[Current])) {
+        while (Current < Source.Length) {
+            while (char.IsWhiteSpace(Source[Current])) {
                 Current++;
                 continue;
             }
@@ -30,73 +40,50 @@ public sealed class Lexer {
             var token = ParseToken();
             Tokens.Add(token);
 
-            if (token.Type is TokenType.Bad) {
-                return Tokens;
-            }
-
             Current++;
         }
 
-        Tokens.Add(new("", TokenType.Eof));
-
-        if (IsDebug) {
-            PrintLexer();
-        }
-
+        PrintLexer();
         return Tokens;
     }
 
     private Token ParseToken() {
-        var token = Source[Current];
-
-        return Source[Current] switch {
-            _ when char.IsLetter(token) => ParseIdentifier(),
-            _ when char.IsDigit(token) => ParseNumeric(),
-            _ => Error($"invalid token: '{token}'")
-        };
+        if (char.IsLetter(Source[Current])) {
+            return ParseIdentifier();
+        }
+else if (char.IsDigit(Source[Current])) {
+    return ParseNumeric();
+}
+        return new("", TokenType.BadToken);
     }
+
 
     private Token ParseIdentifier() {
         int start = Current;
-        while (!IsEnd() && (Source[Current] is '_' || char.IsLetter(Source[Current])))
+        while (Current < Source.Length && char.IsLetter(Source[Current]))
             Current++;
+        var value = Source[start..Current];
 
-        var lexeme = Source[start..Current];
-        Console.WriteLine(lexeme);
-
-        if (Keywords.TryGetValue(lexeme, out var type)) {
-            return new(lexeme, type);
-        }
-
-        if (!IsEnd() && Source[Current] is ':') {
-            return new(lexeme, TokenType.Label);
-        }
-
-        return new(lexeme, TokenType.Identifier);
+            if (Keywords.TryGetValue(value, out var keywordType)) {
+    return new(value, keywordType);
+}
+        return new(value, TokenType.Identifier);
     }
 
     private Token ParseNumeric() {
-        int start = Current;
-        while (!IsEnd() && char.IsDigit(Source[Current]))
-            Current++;
+    int start = Current;
+    while (Current < Source.Length && char.IsDigit(Source[Current]))
+        Current++;
 
-        var lexeme = Source[start..Current];
-        return new(lexeme, TokenType.Numeric);
-    }
-
-    private static Token Error(string message) {
-        Console.WriteLine(message);
-        return new("", TokenType.Bad);
-    }
+    var value = Source[start..Current];
+    return new(value, TokenType.Numeric);
+}
 
     private void PrintLexer() {
+        Console.WriteLine($"Source: {Source}");
         Console.WriteLine("\nTokens:");
         foreach (var token in Tokens) {
-            Console.WriteLine($"  {token.Type}: {token.Lexeme}");
+            Console.WriteLine($"\t{token.Type}: {token.Value}");
         }
-    }
-
-    private bool IsEnd() {
-        return Current >= Source.Length;
     }
 }

@@ -1,3 +1,5 @@
+## Project Setup
+
 Navigate to a folder where you want to the project to be saved. You can create a new C# console application by opening a terminal and entering the following.
 
 ```
@@ -15,7 +17,5 @@ You should see:
 ```
 Hello, World!
 ```
-
-<br/>
 
 Now we can begin writing the program.
