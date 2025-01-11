@@ -1,3 +1,5 @@
+## Part 1 - Stack Machine
+
 We’re going to begin at a very basic level and write a simple interpreter for a very basic instruction set. The interpreter will use a stack data structure for operations like storing and retrieving data, making it an implementation of a stack machine. We will interact with the stack primarily through ‘push’ and ‘pop’ operations.
 
 I will be using C-Sharp for this project as it provides a high level of abstraction with a straightforward and user-friendly environment for working with concepts related to interpretation. I suggest you follow in the same language for clarity. If this was a real-world application, a low-level system language such as C or Rust would usually be employed primarily for performance and fine control over system resources. However, working in a higher abstracted plane can provide a more feasible learning experience while still allowing us to explore notable concepts.

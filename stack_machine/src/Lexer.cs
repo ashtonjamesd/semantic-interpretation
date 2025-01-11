@@ -13,7 +13,9 @@ public enum TokenType {
     Pop,
     Numeric,
     Identifier,
-    BadToken
+    BadToken,
+    Print,
+    Eof
 }
 
 public class Lexer {
@@ -24,6 +26,7 @@ public class Lexer {
     private readonly Dictionary<string, TokenType> Keywords = new() {
         ["push"] = TokenType.Push,
         ["pop"] = TokenType.Pop,
+        ["print"] = TokenType.Print,
     };
 
     public Lexer(string source) {
@@ -42,6 +45,8 @@ public class Lexer {
 
             Current++;
         }
+
+        Tokens.Add(new("", TokenType.Eof));
 
         PrintLexer();
         return Tokens;

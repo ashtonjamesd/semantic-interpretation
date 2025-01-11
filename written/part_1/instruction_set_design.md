@@ -1,3 +1,5 @@
+## Instruction Set Design
+
 The first step that takes place when creating a language is the designing of the syntax. This refers to a set of rules defined in a language that dictate what is valid source code and what is not. A uniform method for representing language grammar is Backus Naur Form (BNF), however, the syntax of this language is simple enough that we can create a simplified representation of the instruction set with no particular notation.
 
 The initial instructions defined in our stack machine are as follows:

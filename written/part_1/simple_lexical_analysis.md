@@ -225,4 +225,10 @@ Tokens:
     Identifier: test
 ```
 
+One last thing we need to do to aid the execution of the tokens is to provide a terminator token so the interpreter knows when to stop executing. We can add a new 'Eof' value to the TokenType enum and then push a token at the end of the Tokenize method.
+
+```
+Tokens.Add(new("", TokenType.Eof));
+```
+
 We have successfully completed the first step of translating the source code into a high-level representation suitable for use by the program's execution component. With this foundation in place, we can now proceed to develop the core of the interpreter.

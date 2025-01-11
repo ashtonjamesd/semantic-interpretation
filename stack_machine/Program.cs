@@ -4,5 +4,8 @@
 
         var lexer = new Lexer(source);
         var tokens = lexer.Tokenize();
+
+        var machine = new StackMachine(tokens);
+        machine.Execute();
     }
 }
