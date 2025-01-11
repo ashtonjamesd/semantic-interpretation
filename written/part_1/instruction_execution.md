@@ -109,7 +109,7 @@ public enum TokenType {
 }
 ```
 
-Next, we add a new entry into our Keywords dictionary so that lexer recognises it as a valid keyword token. 
+Next, we add a new entry into our Keywords dictionary so that lexer recognises it as a valid keyword token.
 
 ```
 ["print"] = TokenType.Print,
@@ -167,7 +167,7 @@ You may have noticed that every time we want to add a new instruction implementa
 private readonly Dictionary<TokenType, Func<bool>> Registry;
 ```
 
-Now we initialise the registry through the StackMachine contsructor.
+Now we initialise the registry through the StackMachine constructor.
 
 ```
 Registry = new() {
