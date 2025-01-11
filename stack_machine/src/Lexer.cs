@@ -12,6 +12,8 @@ public enum TokenType {
     Push,
     Pop,
     Numeric,
+    Add,
+    Sub,
     Identifier,
     BadToken,
     Print,
@@ -27,6 +29,8 @@ public class Lexer {
         ["push"] = TokenType.Push,
         ["pop"] = TokenType.Pop,
         ["print"] = TokenType.Print,
+        ["add"] = TokenType.Add,
+        ["sub"] = TokenType.Sub,
     };
 
     public Lexer(string source) {

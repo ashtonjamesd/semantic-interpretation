@@ -1,7 +1,4 @@
-push 3
-push 2
-push 1
-
-print pop
-print pop
-print pop
+push 18
+push 5
+sub
+print

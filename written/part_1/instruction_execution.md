@@ -190,6 +190,59 @@ else {
 }
 ```
 
-Now let’s make the stack machine a bit more interesting and implement some basic mathematical operations to the stack machine.
+We attempt to find a method corresponding with the token type. If a match is found, it is executed, otherwise it is treated as an error and the program terminates. This makes our code a lot easier to extend as all we need to do is define a new method and create a new registry entry.
 
-ADD CODE
+Now let’s make the stack machine a bit more interesting and implement some basic mathematical operations to the stack machine: addition and subtraction. They both work by taking the top two values on the stack and applying the operation.
+
+In the Lexer, we first add the Add and Sub values to the TokenType enum as well as a Keyword entry for each. Next we provide the StackMachine with the implementation for the addition and subtraction methods.
+
+```
+private bool ExecuteAdd() {
+    if (Stack.Count < 2) {
+        return Error("not enough values on the stack to perform 'add'");
+    }
+
+    var a = Stack.Pop();
+    var b = Stack.Pop();
+
+    Stack.Push(a + b);
+
+    return true;
+}
+```
+
+For addition, we must check if the stack has the required two values on the stack. If so, we simply pop both and push the result of their addition.
+
+```
+private bool ExecuteSub() {
+    if (Stack.Count < 2) {
+        return Error("not enough values on the stack to perform 'sub'");
+    }
+
+    var a = Stack.Pop();
+    var b = Stack.Pop();
+
+    Stack.Push(b - a);
+
+    return true;
+}
+```
+
+The implementation for Sub is similar but instead we subtract the two numbers.
+
+Let's test the new implementations:
+
+```
+push 5
+push 7
+add
+print // 12
+```
+
+
+```
+push 18
+push 5
+sub
+print // 13
+```

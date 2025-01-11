@@ -10,6 +10,8 @@ internal sealed class StackMachine {
             [TokenType.Push] = ExecutePush,
             [TokenType.Pop] = ExecutePop,
             [TokenType.Print] = ExecutePrint,
+            [TokenType.Add] = ExecuteAdd,
+            [TokenType.Sub] = ExecuteSub,
         };
     }
 
@@ -69,6 +71,32 @@ internal sealed class StackMachine {
         }
 
         Console.WriteLine(Stack.Peek());
+
+        return true;
+    }
+
+    private bool ExecuteAdd() {
+        if (Stack.Count < 2) {
+            return Error("not enough values on the stack to perform 'add'");
+        }
+
+        var a = Stack.Pop();
+        var b = Stack.Pop();
+
+        Stack.Push(a + b);
+
+        return true;
+    }
+
+    private bool ExecuteSub() {
+        if (Stack.Count < 2) {
+            return Error("not enough values on the stack to perform 'sub'");
+        }
+
+        var a = Stack.Pop();
+        var b = Stack.Pop();
+
+        Stack.Push(b - a);
 
         return true;
     }
