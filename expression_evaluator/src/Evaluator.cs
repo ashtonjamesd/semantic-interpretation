@@ -58,8 +58,6 @@ public class Evaluator(string source) {
         return ParseNumeric();
     }
 
-
-
     private double ParseNumeric() {
         int start = Current;
         bool hasDecimal = false;

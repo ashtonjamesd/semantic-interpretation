@@ -2,7 +2,7 @@
 
 To create a mathematical expression evaluator, we first need to understand the concepts of precedence and the order of operations.
 
-The order of operations is a set of rules that determines the sequence in which mathematical operations should be performed in an expression. Each operation is assigned a rank of precedence, which dictates its priority relative to other operations. Operators that have lower precedence are executed after those with higher precidence.
+The order of operations is a set of rules that determines the sequence in which mathematical operations should be performed in an expression. Each operation is assigned a rank of precedence, which dictates its priority relative to other operations. Operators that have lower precedence are executed after those with higher precedence.
 
 It can help to visualise precedence using parentheses that are implicitly placed around the expression. For instance, the expression `2 + 2 * 4` is evaluated as `2 + (2 * 4)`, as the `2 * 4` is evaluated first, and then added with the `2`.
 
@@ -16,7 +16,7 @@ However, we can place brackets around the additive expression to increase the pr
 (2 + 2) * 4  // 16
 ```
 
-Likewise, the following expression is implicity grouped as such:
+Likewise, the following expression is implicitly grouped as such:
 
 ```
 2 - (3 * 4) + 2 + (4 * 2)  // 0
@@ -80,7 +80,7 @@ public class Evaluator {
 
 The `Source` field contains the input expression to be evaluated, and the `Current` variable serves as a pointer for iterating through each character in this string.
 
-We can start the tokenization by parsing the numbers within the expression. To do this, we begin at the first digit and ocntinue iterating until we encuonter a non-numeric character. We also ensure that the pointer is within the bounds of the string to avoid index-out-of-range errors.
+We can start the tokenization by parsing the numbers within the expression. To do this, we begin at the first digit and continue iterating until we encounter a non-numeric character. We also ensure that the pointer is within the bounds of the string to avoid index-out-of-range errors.
 
 Once the number has been traversed, we can slice a section of the input from the starting index to the current pointer position. We then convert this substring into a numerical value.
 
@@ -135,7 +135,7 @@ if (char.IsDigit(c)) {
 
 Next, we want to be able to parse basic additive expressions with plus and minus operations. We can create another method called `ParseTerm` which will handle the parsing for us.
 
-We first attempt to parse a numeric token, as that is how all expressions will begin. Then, as the parser continues to encounter plus and minus operators, we parse the next token in the expression. We then accumulatively add the result to `left`.
+We first attempt to parse a numeric token, as that is how all expressions will begin. Then, as the parser continues to encounter plus and minus operators, we parse the next token in the expression. We then cumulatively add the result to `left`.
 
 ```
 private double ParseTerm() {
@@ -183,7 +183,7 @@ private double ParseFactor() {
 }
 ```
 
-We do the exact same thing, except we check for the the star and slash symbols and call the `ParseNumeric` method. `ParseTerm` will now call the `ParseFactor` method instead of `ParseNumeric` to account for the precedence in the expression.
+We do the exact same thing, except we check for the star and slash symbols and call the `ParseNumeric` method. `ParseTerm` will now call the `ParseFactor` method instead of `ParseNumeric` to account for the precedence in the expression.
 
 Brackets can also be nested within an expression, changing the order of precedence temporarily. This is fairly simple to implement and involves checking if a numeric is surrounded by brackets before it is parsed as a number. `ParseFactor` will now call the `ParseGroup` method.
 
@@ -204,7 +204,7 @@ private double ParseGroup() {
 
 First, we check if there is an open parenthesis character, indicating the beginning of a grouping expression. We then evaluate the expression inside of the grouping by calling `ParseTerm`. We also check for a closing parenthesis to complete the expression. If the bracket has not been closed, then we throw an error as it will not correctly parse the expression. If there are no parentheses we simply continue to parse a numeric token as normal.
 
-Negative numbers are straightforward to parse since they are simply preceeded by a `-` symbol. We can adjust the `ParseGroup` method to check for a this symbol, in which case we negate and return the result of parsing an a group expression.
+Negative numbers are straightforward to parse since they are simply preceded by a `-` symbol. We can adjust the `ParseGroup` method to check for this symbol, in which case we negate and return the result of parsing a group expression.
 
 ```
 private double ParseGroup() {
