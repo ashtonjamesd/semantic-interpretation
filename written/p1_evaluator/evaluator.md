@@ -4,19 +4,21 @@ To create a mathematical expression evaluator, we first need to understand the c
 
 The order of operations is a set of rules that determines the sequence in which mathematical operations should be performed in an expression. Each operation is assigned a rank of precedence, which dictates its priority relative to other operations. Operators that have lower precedence are executed after those with higher precedence.
 
+We are going to model the precedence of our expression evaluator with an algorithm called recursive descent parsing, in which each level of operator precedence will have a separate recursive method. In recursive descent parsing, the lower precedence methods call the higher precedence methods so that they are executed first, therefore taking precedence.
+
 It can help to visualise precedence using parentheses that are implicitly placed around the expression. For instance, the expression `2 + 2 * 4` is evaluated as `2 + (2 * 4)`, as the `2 * 4` is evaluated first, and then added with the `2`.
 
 ```
 2 + 2 * 4  // 10
 ```
 
-However, we can place brackets around the additive expression to increase the precedence it has over the multiplicative expression.
+However, we can insert brackets around the additive expression to increase the precedence it has over the multiplicative expression.
 
 ```
 (2 + 2) * 4  // 16
 ```
 
-Likewise, the following expression is implicitly grouped as such:
+Likewise, the following expression is evaluated with these implicit parentheses:
 
 ```
 2 - (3 * 4) + 2 + (4 * 2)  // 0
@@ -24,7 +26,7 @@ Likewise, the following expression is implicitly grouped as such:
 
 <br/>
 
-With a good grasp on mathematical precedence and the order of operations, we can begin to parse the input string for our expression evaluator. To be able to evaluate the string expression, we first need to parse the expression into tokens.
+With a good grasp on mathematical precedence and the order of operations, we can begin to write the string parser for our expression evaluator. To be able to evaluate the string input, we first need to parse it into tokens.
 
 For instance, given this input:
 
@@ -62,6 +64,7 @@ Our evaluator also needs to correctly identify and parse numbers, regardless of 
 
 To correctly handle all of these cases, we need a strategy to parse the numbers from the input string. We will start by creating a class to encapsulate the behavior of the evaluator and a method for parsing the number tokens.
 
+The source will be provided through the constructor and will remain immutable thereafter. Additionally, all whitespace in the source string will be removed to simplify the parsing process.
 
 ```
 public class Evaluator {
@@ -82,7 +85,7 @@ The `Source` field contains the input expression to be evaluated, and the `Curre
 
 We can start the tokenization by parsing the numbers within the expression. To do this, we begin at the first digit and continue iterating until we encounter a non-numeric character. We also ensure that the pointer is within the bounds of the string to avoid index-out-of-range errors.
 
-Once the number has been traversed, we can slice a section of the input from the starting index to the current pointer position. We then convert this substring into a numerical value.
+Once the number has been traversed, we can slice a section of the input from the starting index to the current pointer position. We then convert this substring into a numerical value. The implementation for this is below:
 
 ```
 private double ParseNumeric() {
@@ -126,11 +129,9 @@ char c = Source[Current];
 if (char.IsDigit(c)) {
     Current++;
 } else if (c is '.' && !hasDecimal) {
-    hasDecimal = true;
     Current++;
-} else {
-    break;
-}
+    hasDecimal = true;
+} else break;
 ```
 
 Next, we want to be able to parse basic additive expressions with plus and minus operations. We can create another method called `ParseTerm` which will handle the parsing for us.
@@ -167,7 +168,7 @@ Let's test our expression parser so far with the following input:
 
 And we correctly get `604.4`.
 
-Now we want to add functionality for multiplicative operations such as times and divide. For this, we can create a new method called 'ParseFactor' and handle the logic in there.
+Now we want to add functionality for multiplicative operations such as times and divide. For this, we can create a new method called `ParseFactor` and handle the logic in there.
 
 ```
 private double ParseFactor() {
@@ -202,7 +203,7 @@ private double ParseGroup() {
 }
 ```
 
-First, we check if there is an open parenthesis character, indicating the beginning of a grouping expression. We then evaluate the expression inside of the grouping by calling `ParseTerm`. We also check for a closing parenthesis to complete the expression. If the bracket has not been closed, then we throw an error as it will not correctly parse the expression. If there are no parentheses we simply continue to parse a numeric token as normal.
+First, we check if there is an open parenthesis character, indicating the beginning of a grouping expression. We then evaluate the expression inside of the grouping by calling `ParseTerm`. We also check for a closing parenthesis to complete the expression. If the bracket has not been closed, then we throw an error as it will not correctly parse the expression. If there are no parentheses we simply continue to parse and return a numeric token as normal.
 
 Negative numbers are straightforward to parse since they are simply preceded by a `-` symbol. We can adjust the `ParseGroup` method to check for this symbol, in which case we negate and return the result of parsing a group expression.
 
@@ -229,4 +230,4 @@ Why don't you experiment and use what you have learnt to implement exponentiatio
   // 2 + ((2^4) * 2)
 ```
 
-Next, we're going to look at writing an actual simplified language interpreter.
+Next, we're going to look more closely an lexical analysis and write our own simplified language interpreter.
