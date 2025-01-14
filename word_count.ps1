@@ -1,4 +1,4 @@
-$files = Get-ChildItem "C:\Users\rxgqq\projects\semantic-interpretation\written" -Recurse -Filter "*.md"
+$files = Get-ChildItem ".\written" -Recurse -Filter "*.md"
 
 $total = 0
 foreach ($file in $files) {

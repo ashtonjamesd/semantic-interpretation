@@ -1,6 +1,30 @@
-Let's start with the simplest part of the expression evaluator - parsing the actual numbers inside of the expression.
+## Evaluating Expression
 
-To be able to evaluate the string expression, we first need to parse the expression into tokens.
+To create a mathematical expression evaluator, we first need to understand the concepts of precedence and the order of operations.
+
+The order of operations is a set of rules that determines the sequence in which mathematical operations should be performed in an expression. Each operation is assigned a rank of precedence, which dictates its priority relative to other operations. Operators that have lower precedence are executed after those with higher precidence.
+
+It can help to visualise precedence using parentheses that are implicitly placed around the expression. For instance, the expression `2 + 2 * 4` is evaluated as `2 + (2 * 4)`, as the `2 * 4` is evaluated first, and then added with the `2`.
+
+```
+2 + 2 * 4  // 10
+```
+
+However, we can place brackets around the additive expression to increase the precedence it has over the multiplicative expression.
+
+```
+(2 + 2) * 4  // 16
+```
+
+Likewise, the following expression is implicity grouped as such:
+
+```
+2 - (3 * 4) + 2 + (4 * 2)  // 0
+```
+
+<br/>
+
+With a good grasp on mathematical precedence and the order of operations, we can begin to parse the input string for our expression evaluator. To be able to evaluate the string expression, we first need to parse the expression into tokens.
 
 For instance, given this input:
 
@@ -14,7 +38,7 @@ We need to extract the following tokens:
 (754) (+) (23)
 ```
 
-Our evaluator needs to correctly identify and parse numbers, regardless of their format. Numbers in our evaluator can be:
+Our evaluator also needs to correctly identify and parse numbers, regardless of their format. Numbers in our evaluator can be:
 
 
 1. Whole numbers
@@ -36,9 +60,7 @@ Our evaluator needs to correctly identify and parse numbers, regardless of their
 -42 -3.14
 ```
 
-To correctly handle all of these cases, we need a strategy to parse the numbers from the input string.
-
-We will start by creating a class to encapsulate the behavior of the evaluator and a method for parsing the number tokens.
+To correctly handle all of these cases, we need a strategy to parse the numbers from the input string. We will start by creating a class to encapsulate the behavior of the evaluator and a method for parsing the number tokens.
 
 
 ```
@@ -56,11 +78,11 @@ public class Evaluator {
 }
 ```
 
-The `Source` field holds the input expression passed to the evaluator. We will loop through each character in this string using `Current` as a pointer.
+The `Source` field contains the input expression to be evaluated, and the `Current` variable serves as a pointer for iterating through each character in this string.
 
-To successfully tokenize a number, we start at the first digit and keep looping until we encounter a non-numeric character. We also need to make sure that the value of the pointer is less than the length of the string to prevent index out of range errors.
+We can start the tokenization by parsing the numbers within the expression. To do this, we begin at the first digit and ocntinue iterating until we encuonter a non-numeric character. We also ensure that the pointer is within the bounds of the string to avoid index-out-of-range errors.
 
-Once the number has been traversed, we can slice a section of the input, from the index of the first character to the current pointer value.
+Once the number has been traversed, we can slice a section of the input from the starting index to the current pointer position. We then convert this substring into a numerical value.
 
 ```
 private double ParseNumeric() {
@@ -80,30 +102,30 @@ private double ParseNumeric() {
 Let's test it with the following input:
 
 ```
-var evaluator = new Evaluator("754);
+var evaluator = new Evaluator("754");
 
 var result = evaluator.Parse();
 Console.WriteLine(result); // 754
 ```
 
-Great, now we can add functionality for decimal numbers. This is a relatively simple change and involves only accounting for an optional singular dot character in the number.
+<br/>
 
-We can declare a flag to keep track of whether the decimal point has been encountered yet:
+Great, now we can add functionality for decimal numbers. This change is relatively simple and involves only accounting for an optional dot character in the number.
+
+Since we only allow for one dot in any given number, we can declare a flag to keep track of whether the decimal point has been encountered yet:
 
 ```
 bool hasDecimal = false;
 ```
 
-We check if the current character is a dot, if so, we check if the flag has already been set to true, in which an error will be thrown. Otherwise, we set the flag to true and continue to parse the number.
-
-We can adjust the inside of the loop with the following:
+We can adjust the inside of the loop to check if the current character is a dot, if so, we check if the flag has already been set to true, in which an error will be thrown. Otherwise, we set the flag to true and continue to parse the number.
 
 ```
 char c = Source[Current];
 
 if (char.IsDigit(c)) {
     Current++;
-} else if (c == '.' && !hasDecimal) {
+} else if (c is '.' && !hasDecimal) {
     hasDecimal = true;
     Current++;
 } else {
@@ -113,7 +135,7 @@ if (char.IsDigit(c)) {
 
 Next, we want to be able to parse basic additive expressions with plus and minus operations. We can create another method called `ParseTerm` which will handle the parsing for us.
 
-We first attempt to parse a number, as that is how all expressions will begin. Then, as the parser continues to encounter plus and minus operators, we parse the next token in the expression. We then accumulatively add the result to `left`.
+We first attempt to parse a numeric token, as that is how all expressions will begin. Then, as the parser continues to encounter plus and minus operators, we parse the next token in the expression. We then accumulatively add the result to `left`.
 
 ```
 private double ParseTerm() {
@@ -122,7 +144,6 @@ private double ParseTerm() {
     while (Match('+') || Match('-')) {
         char op = Source[Current - 1];
         var right = ParseNumeric();
-        Console.WriteLine(right);
         left = op == '+' ? left + right : left - right;
     }
 
@@ -146,9 +167,7 @@ Let's test our expression parser so far with the following input:
 
 And we correctly get `604.4`.
 
-Now we want to add support for multiplicative operations such as times and divide.
-
-For this, we can create a new method called 'ParseFactor' and handle the logic in there.
+Now we want to add functionality for multiplicative operations such as times and divide. For this, we can create a new method called 'ParseFactor' and handle the logic in there.
 
 ```
 private double ParseFactor() {
@@ -164,21 +183,9 @@ private double ParseFactor() {
 }
 ```
 
-We do the exact same thing, except we check for the times and divide operators and call the `ParseNumeric` method. `ParseTerm` will now call the `ParseFactor` method instead of `ParseNumeric`.
+We do the exact same thing, except we check for the the star and slash symbols and call the `ParseNumeric` method. `ParseTerm` will now call the `ParseFactor` method instead of `ParseNumeric` to account for the precedence in the expression.
 
-In mathematics, the order of operations can be overidden with the use of brackets to increase the precedence of specific tokens. For instance, the expression below would evaluate to 10 as the `2 * 4` is evaluated first, then it is added to `2`.
-
-```
-2 + 2 * 4      // 10
-```
-
-However, we can place brackets around the additive expression to increase the precedence it has over the multiplicative expression.
-
-```
-(2 + 2) * 4    // 16
-```
-
-As you can see, this yeilds a different result. This is fairly simple to implement and involves checking if a numeric is surrounded by brackets before it is parsed as a number.
+Brackets can also be nested within an expression, changing the order of precedence temporarily. This is fairly simple to implement and involves checking if a numeric is surrounded by brackets before it is parsed as a number. `ParseFactor` will now call the `ParseGroup` method.
 
 ```
 private double ParseGroup() {
@@ -195,9 +202,9 @@ private double ParseGroup() {
 }
 ```
 
-First, we check if there is a matching parentheses, indicating the beginning of a grouping expression. We then evaluate the expression inside of the grouping by calling `ParseTerm`. We also check for a closing parentheses to complete the expression. If the bracket has not been closed, then we throw an error as it will not correctly parse the expression. If there are no parentheses we simply continue to parse a numeric as normal.
+First, we check if there is an open parenthesis character, indicating the beginning of a grouping expression. We then evaluate the expression inside of the grouping by calling `ParseTerm`. We also check for a closing parenthesis to complete the expression. If the bracket has not been closed, then we throw an error as it will not correctly parse the expression. If there are no parentheses we simply continue to parse a numeric token as normal.
 
-Negative numbers are easy to parse since they are simply preceeded by a `-` symbol. We can adjust the `ParseGroup` method to check for a minus symbol, in which case we negate the result of parsing an additional group expression.
+Negative numbers are straightforward to parse since they are simply preceeded by a `-` symbol. We can adjust the `ParseGroup` method to check for a this symbol, in which case we negate and return the result of parsing an a group expression.
 
 ```
 private double ParseGroup() {
@@ -210,3 +217,16 @@ private double ParseGroup() {
     return ParseNumeric();
 }
 ```
+
+And that's it. We have successfully created a mathematical expression evaluator that can handle the four basic operators, along with manual precedence, decimal numbers, negative numbers, and has whitespace tolerance. 
+
+Why don't you experiment and use what you have learnt to implement exponentiation in the evaluator. For instance:
+
+```
+2 + 2^4 * 2 // 34
+
+  // the precedence is as follows:
+  // 2 + ((2^4) * 2)
+```
+
+Next, we're going to look at writing an actual simplified language interpreter.
