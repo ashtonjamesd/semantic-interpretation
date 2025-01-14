@@ -19,12 +19,23 @@ public class Evaluator(string source) {
     }
 
     private double ParseFactor() {
-        var left = ParseGroup();
+        var left = ParseExponent();
 
         while (Match('*') || Match('/')) {
             char op = Source[Current - 1];
-            var right = ParseGroup();
+            var right = ParseExponent();
             left = op is '*' ? left * right : left / right;
+        }
+
+        return left;
+    }
+
+    private double ParseExponent() {
+        var left = ParseGroup();
+
+        while (Match('^')) {
+            var right = ParseGroup();
+            left = Math.Pow(left, right);
         }
 
         return left;
@@ -46,6 +57,8 @@ public class Evaluator(string source) {
 
         return ParseNumeric();
     }
+
+
 
     private double ParseNumeric() {
         int start = Current;
