@@ -195,7 +195,18 @@ private double ParseGroup() {
 }
 ```
 
-First, we check if there is a matching parentheses, indicating the beginning of a grouping expression. We then evaluate the expression inside of the grouping by calling `ParseTerm`. We also check for a closing parentheses to complete the expression. If the bracket has not been closed, then we throw an error as it will not correctly parse the expression.
+First, we check if there is a matching parentheses, indicating the beginning of a grouping expression. We then evaluate the expression inside of the grouping by calling `ParseTerm`. We also check for a closing parentheses to complete the expression. If the bracket has not been closed, then we throw an error as it will not correctly parse the expression. If there are no parentheses we simply continue to parse a numeric as normal.
 
-If there are no parentheses we simply continue to parse a numeric as normal.
+Negative numbers are easy to parse since they are simply preceeded by a `-` symbol. We can adjust the `ParseGroup` method to check for a minus symbol, in which case we negate the result of parsing an additional group expression.
 
+```
+private double ParseGroup() {
+    // ...
+
+    if (Match('-')) {
+        return -ParseGroup();
+    }
+    
+    return ParseNumeric();
+}
+```
