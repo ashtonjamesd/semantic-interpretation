@@ -1,10 +1,6 @@
-public class Evaluator {
-    private readonly string Source;
+public class Evaluator(string source) {
+    private readonly string Source = source.Replace(" ", "");
     private int Current = 0;
-
-    public Evaluator(string source) {
-        Source = source.Replace(" ", "");
-    }
 
     public double Parse() {
         return ParseTerm();
@@ -16,7 +12,7 @@ public class Evaluator {
         while (Match('+') || Match('-')) {
             char op = Source[Current - 1];
             var right = ParseFactor();
-            left = op == '+' ? left + right : left - right;
+            left = op is '+' ? left + right : left - right;
         }
 
         return left;
@@ -28,7 +24,7 @@ public class Evaluator {
         while (Match('*') || Match('/')) {
             char op = Source[Current - 1];
             var right = ParseGroup();
-            left = op == '*' ? left * right : left / right;
+            left = op is '*' ? left * right : left / right;
         }
 
         return left;
@@ -47,7 +43,7 @@ public class Evaluator {
         if (Match('-')) {
             return -ParseGroup();
         }
-        
+
         return ParseNumeric();
     }
 
@@ -56,11 +52,9 @@ public class Evaluator {
         bool hasDecimal = false;
 
         while (Current < Source.Length) {
-            char c = Source[Current];
-
-            if (char.IsDigit(c)) {
+            if (char.IsDigit(Source[Current])) {
                 Current++;
-            } else if (c is '.' && !hasDecimal) {
+            } else if (Source[Current] is '.' && !hasDecimal) {
                 hasDecimal = true;
                 Current++;
             } else {
@@ -68,7 +62,7 @@ public class Evaluator {
             }
         }
 
-        string number = Source[start..Current];
+        var number = Source[start..Current];
         return double.Parse(number);
     }
 
