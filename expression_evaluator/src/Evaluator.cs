@@ -23,11 +23,11 @@ public class Evaluator {
     }
 
     private double ParseFactor() {
-        var left = ParseNumeric();
+        var left = ParseGroup();
 
         while (Match('*') || Match('/')) {
             char op = Source[Current - 1];
-            var right = ParseNumeric();
+            var right = ParseGroup();
             left = op == '*' ? left * right : left / right;
         }
 
@@ -44,6 +44,10 @@ public class Evaluator {
             return val;
         }
 
+        if (Match('-')) {
+            return -ParseGroup();
+        }
+        
         return ParseNumeric();
     }
 

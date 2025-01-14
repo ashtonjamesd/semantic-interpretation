@@ -164,6 +164,38 @@ private double ParseFactor() {
 }
 ```
 
-We do the exact same thing, except we check for the times and divide operators and call the `ParseNumeric` method.
+We do the exact same thing, except we check for the times and divide operators and call the `ParseNumeric` method. `ParseTerm` will now call the `ParseFactor` method instead of `ParseNumeric`.
 
-`ParseTerm` will now call the `ParseFactor` method instead of `ParseNumeric`.
+In mathematics, the order of operations can be overidden with the use of brackets to increase the precedence of specific tokens. For instance, the expression below would evaluate to 10 as the `2 * 4` is evaluated first, then it is added to `2`.
+
+```
+2 + 2 * 4      // 10
+```
+
+However, we can place brackets around the additive expression to increase the precedence it has over the multiplicative expression.
+
+```
+(2 + 2) * 4    // 16
+```
+
+As you can see, this yeilds a different result. This is fairly simple to implement and involves checking if a numeric is surrounded by brackets before it is parsed as a number.
+
+```
+private double ParseGroup() {
+    if (Match('(')) {
+        var val = ParseTerm();
+        if (!Match(')')) {
+            throw new Exception("expected ')'");
+        }
+
+        return val;
+    }
+
+    return ParseNumeric();
+}
+```
+
+First, we check if there is a matching parentheses, indicating the beginning of a grouping expression. We then evaluate the expression inside of the grouping by calling `ParseTerm`. We also check for a closing parentheses to complete the expression. If the bracket has not been closed, then we throw an error as it will not correctly parse the expression.
+
+If there are no parentheses we simply continue to parse a numeric as normal.
+

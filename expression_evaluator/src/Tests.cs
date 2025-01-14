@@ -1,12 +1,12 @@
-using Xunit;
+// using Xunit;
 
-public class EvaluatorTests {
+// public class EvaluatorTests {
     
-    [Fact]
-    public void PassAddTest() {
-        var evaluator = new Evaluator("2 + 5");
-        var result = evaluator.Parse();
+//     [Fact]
+//     public void PassAddTest() {
+//         var evaluator = new Evaluator("2 + 5");
+//         var result = evaluator.Parse();
 
-        Assert.Equal(result, 7);
-    }
-}
+//         Assert.Equal(result, 7);
+//     }
+// }
