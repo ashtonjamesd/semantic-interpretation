@@ -1,12 +1,6 @@
 ## Evaluating Expression
 
-To create a mathematical expression evaluator, we first need to understand the concepts of precedence and the order of operations.
-
-The order of operations is a set of rules that determines the sequence in which mathematical operations should be performed in an expression. Each operation is assigned a rank of precedence, which dictates its priority relative to other operations. Operators that have lower precedence are executed after those with higher precedence.
-
-You may have heard of the acronym 'PEMDAS', which stands for Parentheses, Exponents, Multiplication, Division, Addition, and Subtraction. It describes the order of operations in a way that is easy to remember.
-
-We are going to model the precedence of our expression evaluator with an algorithm called recursive descent parsing, in which each level of operator precedence will have a separate recursive method. In recursive descent parsing, the lower precedence methods call the higher precedence methods so that they are executed first, therefore taking precedence.
+To create a mathematical expression evaluator, we first need to understand the concepts of precedence and the order of operations. The order of operations is a set of rules that determines the sequence in which mathematical operations should be performed in an expression. Each operation is assigned a rank of precedence, which dictates its priority relative to other operations. Operators that have lower precedence are executed after those with higher precedence.
 
 It can help to visualise precedence using parentheses that are implicitly placed around the expression. For instance, the expression `2 + 2 * 4` is evaluated as `2 + (2 * 4)`, as the `2 * 4` is evaluated first, and then added with the `2`.
 
@@ -14,7 +8,7 @@ It can help to visualise precedence using parentheses that are implicitly placed
 2 + 2 * 4  // 10
 ```
 
-However, we can insert brackets around the additive expression to increase the precedence it has over the multiplicative expression.
+We can also insert brackets around the additive expression to increase the precedence it has over the multiplicative expression.
 
 ```
 (2 + 2) * 4  // 16
@@ -26,9 +20,29 @@ Likewise, the following expression is evaluated with these implicit parentheses:
 2 - (3 * 4) + 2 + (4 * 2)  // 0
 ```
 
+The acronym PEMDAS - which stands for Parentheses, Exponents, Multiplication, Division, Addition, and Subtraction - is a helpful way to remember the order of operations in mathematics. This order determines how expressions are evaluated, ensuring consistency and clarity. For instance, multiplication is performed before addition or subtraction, which helps eliminate ambiguity in mathematical problems.
+
+But why is the order of operations structured this way? Why are exponents evaluated before multiplication, and why does multiplication take precedence over addition? The reason is because it simply makes sense to do so. Consider a scenario where you are hosting a party and need to figure out how many drinks you need to buy for your guests. Suppose each table seats 8 guests, and you have 5 tables. Additionally, each guest consumes 3 drinks and you already have 10 drinks in your fridge.
+
+If you approach the problem step by step using PEMDAS, the calculation naturally align with the real-world relationships between the quantities. It is a logical hierarchy that simplifies the computation and ensures that everyone interpreting the expression arrives at the same result.
+
+```
+8 * 5 * 3 + 10.
+```
+
+To achieve the correct number of drinks, we have to evaluate the multiplication first. It would be illogical to add the number of existing drinks in your fridge (10) to the amount of drinks per person (3), as it makes no sense to do so. The actual expression would be evaluated with the precedence below:
+
+```
+(8 * 5 * 3) + 10
+```
+
+The multiplication naturally occurs before the addition, therefore it makes logical sense to align the order of operations in the same way. Hopefully this example gave you a good idea of the concept of precedence and how it works.
+
 <br/>
 
 With a good grasp on mathematical precedence and the order of operations, we can begin to write the string parser for our expression evaluator. To be able to evaluate the string input, we first need to parse it into tokens.
+
+We are going to model the precedence of our expression evaluator with an algorithm called recursive descent parsing, in which each level of operator precedence will have a separate recursive method. In recursive descent parsing, the lower precedence methods call the higher precedence methods so that they are executed first, therefore taking precedence.
 
 For instance, given this input:
 

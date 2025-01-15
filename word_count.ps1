@@ -5,7 +5,9 @@ $results = @()
 
 foreach ($file in $files) {
     $count = (Get-Content $file.FullName | Measure-Object -Word).Words
-    if ($count -eq 0){ continue; }
+    if ($count -eq 0) { 
+        continue; 
+    }
     
     $results += [PSCustomObject]@{
         FileName = $file.BaseName
