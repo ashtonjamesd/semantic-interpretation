@@ -134,7 +134,7 @@ private bool ExecuteJumpWhen() {
 }
 ```
 
-Let's test it is working with a basic program
+Let's test it is working with a basic conditional jump program.
 
 ```
 push 1

@@ -30,3 +30,4 @@ While the lexer performs syntax checks, it primarily focuses on identifying wher
 ```
 let 1 { 'a' =
 ```
+

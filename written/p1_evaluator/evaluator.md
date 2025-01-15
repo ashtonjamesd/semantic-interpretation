@@ -4,6 +4,8 @@ To create a mathematical expression evaluator, we first need to understand the c
 
 The order of operations is a set of rules that determines the sequence in which mathematical operations should be performed in an expression. Each operation is assigned a rank of precedence, which dictates its priority relative to other operations. Operators that have lower precedence are executed after those with higher precedence.
 
+You may have heard of the acronym 'PEMDAS', which stands for Parentheses, Exponents, Multiplication, Division, Addition, and Subtraction. It describes the order of operations in a way that is easy to remember.
+
 We are going to model the precedence of our expression evaluator with an algorithm called recursive descent parsing, in which each level of operator precedence will have a separate recursive method. In recursive descent parsing, the lower precedence methods call the higher precedence methods so that they are executed first, therefore taking precedence.
 
 It can help to visualise precedence using parentheses that are implicitly placed around the expression. For instance, the expression `2 + 2 * 4` is evaluated as `2 + (2 * 4)`, as the `2 * 4` is evaluated first, and then added with the `2`.
@@ -230,4 +232,4 @@ Why don't you experiment and use what you have learnt to implement exponentiatio
   // 2 + ((2^4) * 2)
 ```
 
-Next, we're going to look more closely an lexical analysis and write our own simplified language interpreter.
+Next, we're going to look more closely at lexical analysis and write our own simplified language interpreter.
