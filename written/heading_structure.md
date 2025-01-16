@@ -23,10 +23,12 @@
 
 <br/>
 
-## Part 3.1 - Albus
+## Part 3 Transpiler
 
-## Part 3.2 - Albus Extended
+## Part 4.1 - Albus
 
-## Part 4 - Revisting the Stack Machine
+## Part 4.2 - Albus Extended
+
+## Part 4.3 - Revisting the Stack Machine
 
 ## Part 5 - An Esoteric Interpreter
