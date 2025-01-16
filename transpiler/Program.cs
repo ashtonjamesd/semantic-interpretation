@@ -1,6 +1,6 @@
 ﻿internal class Program {
     static void Main(string[] args) {
-        if (args.Length is not 1) {
+        if (args.Length < 1) {
             Console.WriteLine("expected source file path as a single command line argument.");
             return;
         }
@@ -12,7 +12,8 @@
 
         var source = File.ReadAllText(args[0]);
 
-        var lexer = new Tokenizer(source);
-        var tokens = lexer.Tokenize();
+        var tokenizer = new Tokenizer(source);
+        var tokens = tokenizer.Tokenize();
+
     }
 }

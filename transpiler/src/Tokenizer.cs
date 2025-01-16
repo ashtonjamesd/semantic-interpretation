@@ -33,20 +33,20 @@ public class Tokenizer {
             _ when char.IsLetter(token) => ParseIdentifier(),
             '\"' => ParseString(),
             '\'' => ParseChar(),
-            _ => Error("invalid token")
+            _ => SyntaxError("invalid token")
         };
     }
 
     private Token ParseChar() {
         Current++;
         if (IsEnd() || Source[Current] is '\'') {
-            return Error("empty char literal");
+            return SyntaxError("empty char literal");
         }
 
         var lexeme = Source[Current++].ToString();
         
         if (IsEnd() || Source[Current++] is not '\'') {
-            return Error("invalid char literal");
+            return SyntaxError("invalid char literal");
         }
 
         return NewToken(lexeme, TokenKind.Char);
@@ -69,7 +69,7 @@ public class Tokenizer {
         while (!IsEnd() && (char.IsDigit(Source[Current]) || Source[Current] is '.')) {
             if (Source[Current] is '.') {
                 if (hasDecimal) {
-                    return Error("invalid format for numeric literal");
+                    return SyntaxError("invalid format for numeric literal");
                 }
 
                 hasDecimal = true;
@@ -93,7 +93,7 @@ public class Tokenizer {
         var lexeme = Source[start..(Current + (IsEnd() ? 0 : 1))];
 
         if (lexeme[^1] is not '\"') {
-            return Error("unterminated string literal");
+            return SyntaxError("unterminated string literal");
         }
 
         return NewToken(lexeme, TokenKind.String);
@@ -103,7 +103,7 @@ public class Tokenizer {
         return new(lexeme, kind, CurrentLine);
     }
 
-    private Token Error(string message) {
+    private Token SyntaxError(string message) {
         Console.WriteLine(message);
         return NewToken("", TokenKind.Bad);
     }
