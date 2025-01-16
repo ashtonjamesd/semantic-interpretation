@@ -1,4 +1,4 @@
-## Evaluating Expression
+## Evaluating Expressions
 
 To create a mathematical expression evaluator, we first need to understand the concepts of precedence and the order of operations. The order of operations is a set of rules that determines the sequence in which mathematical operations should be performed in an expression. Each operation is assigned a rank of precedence, which dictates its priority relative to other operations. Operators that have lower precedence are executed after those with higher precedence.
 

@@ -15,4 +15,3 @@ The eight commands in Brainfuck are:
 6. `]` - If the value at the data pointer is not zero, jump back to the command after the matching ']'
 7. `.` - Output the value at the data pointer
 8. `,` - Accept input and store at the current data pointer position
-

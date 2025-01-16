@@ -6,7 +6,7 @@ A language may be written such that certain words are built-in and considered pa
 
 The primary goal of syntax is to enforce a standard procedure of writing code in a specific language. It ensures that code can be understood by the computer and executed without errors. If a programmer writes code that contains invalid characters or something against the language rules (syntactically invalid), then a syntax error will occur, preventing the program from running.
 
-A common example of syntax in languages from the C-family is the semicolon statement terminator. This syntax rule enforces that statements written in the language must end with a semicolon character to inform the C compiler that the statement is finished and anything after is a new statement. Missing semicolons can confuse the compiler, such with the example below.
+A common example of syntax in languages from the C-family is the semicolon statement terminator. This syntax rule enforces that statements written in the language must end with a semicolon character to inform the C compiler that the statement is finished and anything after is a new statement. Missing semicolons can confuse the compiler, such as with the example below.
 
 ```
 int x = 10; // valid
@@ -25,9 +25,10 @@ if (isNull) {
 
 This will be tokenized into the following: `if` `(` `isNull` `)` `{` `return` `;` `}`. In this example, the `if` and `return` are keywords as they operate with the behaviour and flow of the language itself. These tokens will then be passed to the next stage of the interpretation process - the parser.
 
-While the lexer performs syntax checks, it primarily focuses on identifying where specific characters are expected to appear, whereas the parser is responsible for recognizing and organizing specific tokens based on the grammar of the language. For instance, the following code would likely be considered valid grammar by the lexer, however this expression is very illogical and likely does not follow the grammar of the language.
+While the lexer performs syntax checks, it primarily focuses on identifying where specific characters are expected to appear, whereas the parser is responsible for recognizing and organizing specific tokens based on the grammar of the language. For instance, take the following example.
 
 ```
 let 1 { 'a' =
 ```
 
+This code snippet would likely be considered valid grammar by the lexer, however this expression is very illogical and likely does not follow the semantic grammar of the language.
