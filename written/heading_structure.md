@@ -23,12 +23,15 @@
 
 <br/>
 
-## Part 3 Transpiler
+## Part 3.1 - Albus
+### Lexical Analysis
+### Abstract Syntax Tree
 
-## Part 4.1 - Albus
 
-## Part 4.2 - Albus Extended
+<br/>
 
-## Part 4.3 - Revisting the Stack Machine
+## Part 3.2 - Albus Extended
 
-## Part 5 - An Esoteric Interpreter
+## Part 3.3 - Revisting the Stack Machine
+
+## Part 4 - An Esoteric Interpreter

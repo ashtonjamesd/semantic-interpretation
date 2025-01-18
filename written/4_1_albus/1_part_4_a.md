@@ -1,6 +1,5 @@
 ## The Albus Language Interpreter
 
-
 Finally, we can start the real project. This section will cover, in detail, the entire process of creating a sophisticated programming language interpreter from scratch. Having followed this guide diligently, you're should be adequately prepared to follow along through this project. This language, named Albus, is designed to be statically typed, object-oriented, and minimalist, with a syntax influenced by Ruby. We will work through the initial front end part of the interpreter relatively quickly as we have already covered some of the main concepts in some detail.
 
 Although it is written in C-Sharp for the purpose of this book, I have plans to rewrite Albus in a more suitable language, such as Rust or Zig (or maybe even C). Maybe I’ll do a book on that in the future - until then, it will have to sorrowfully reside as a sluggish interpreter with no real applicable use.

@@ -6,7 +6,7 @@ $results = @()
 foreach ($file in $files) {
     $count = (Get-Content $file.FullName | Measure-Object -Word).Words
     if ($count -eq 0) { 
-        continue; 
+        continue 
     }
     
     $results += [PSCustomObject]@{
@@ -16,5 +16,6 @@ foreach ($file in $files) {
     $total += $count
 }
 
-$results | Format-Table -AutoSize
+$sortedResults = $results | Sort-Object -Property WordCount
+$sortedResults | Format-Table -AutoSize
 Write-Output ("Total Word Count: " + $total)
