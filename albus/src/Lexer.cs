@@ -1,3 +1,5 @@
+using System.Xml;
+
 namespace albus.src;
 
 public sealed class Lexer(string source, bool debug) {
@@ -178,7 +180,7 @@ public sealed class Lexer(string source, bool debug) {
         var start = Current;
 
         Current++;
-        while (!IsEnd() && Source[Current] != '\"')
+        while (!IsEnd() && Source[Current] is not ('\"' or '\n' or '\r'))
             Current++;
 
         var lexeme = Source[start..(Current + (IsEnd() ? 0 : 1))];
@@ -192,10 +194,13 @@ public sealed class Lexer(string source, bool debug) {
 
     private Token SyntaxError(string message) {
         var line = GetCurrentLine();
-        var idx = Source.IndexOf(line);
+        Console.WriteLine($"{CurrentLine} | {line}");
 
-        Console.WriteLine(line);
-        Console.WriteLine(new string(' ', Current - ++idx) + "^");
+        // Adds the length of the line number to account for the length of x in  'x | ' above, where x is the line number of the error
+        // then, + 3 for the offset of the two spaces and pip character
+        var lineOffset = CurrentLine.ToString().Length + 2;
+        var idx = Source.IndexOf(line);
+        Console.WriteLine(new string(' ', Current - ++idx + lineOffset) + "^");
 
         Console.WriteLine($"{message} on line {CurrentLine}");
 
@@ -205,16 +210,16 @@ public sealed class Lexer(string source, bool debug) {
 
     private string GetCurrentLine() {
         int lineIdx = Current - 1;
-
         while (lineIdx > 0 && Source[lineIdx] != '\n') {
             lineIdx--;
         }
 
         var nextNewLineIdx = Source.IndexOf('\n', lineIdx + 1);
-        if (nextNewLineIdx == -1)
-            return Source[lineIdx..];
+        if (nextNewLineIdx == -1) {
+            return Source[lineIdx..].Replace("\n", "");
+        }
 
-        return Source[lineIdx..nextNewLineIdx];
+        return Source[lineIdx..nextNewLineIdx].Replace("\n", "");
     }
 
     private void LexerDebug() {
