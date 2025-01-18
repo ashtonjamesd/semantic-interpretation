@@ -1,6 +1,8 @@
 ## Tokenization
 
-We will have a similar, albeit slightly more complex, implementation of the Lexer from the stack machine.
+In our transpiler, we will have a similar, albeit slightly more complex, implementation of the Lexer from the stack machine. We will once again begin with a class to handle the tokenization process.
+
+We still continue to parse the source string from start to end with a pointer to the current character in the string.
 
 ```
 public class Tokenizer {
