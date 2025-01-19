@@ -1,5 +1,3 @@
-using System.Xml;
-
 namespace albus.src;
 
 public sealed class Lexer(string source, bool debug) {

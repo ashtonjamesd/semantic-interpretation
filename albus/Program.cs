@@ -30,6 +30,11 @@ internal class Program {
             return;
         }
 
-        
+        var parser = new Parser(tokens);
+        var ast = parser.ParseAst();
+
+        foreach (var expr in ast.Body) {
+            Console.WriteLine($"Expr: {expr}");
+        }
     }
 }
