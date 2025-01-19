@@ -38,7 +38,7 @@ Next, we need to add the implementation details for the ‘push’ and ‘pop’
 
 ```
 private bool ExecutePush() {
-    // in the event of 'push ' with no argument
+    // in the event of 'push' with no argument
     if (InstructionPointer >= Tokens.Count) {
         return Error("expected argument after 'push'");
     }
@@ -47,7 +47,7 @@ private bool ExecutePush() {
 
     var arg = Tokens[InstructionPointer].Value;
     
-    // in the event of an invalid push 'push f'
+    // in the event of an invalid push, such as 'push f'
     if (!int.TryParse(arg, out var argInt)) {
         return Error("expected numeric argument after 'push'");
     }

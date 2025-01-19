@@ -621,7 +621,7 @@ if (!Expect(TokenType.Then, "'then' after if statement condition")) {
 }
 ```
 
-Next, to parse the body of the if statement, we loop continuously until we encounter an `endif` token, while adding each statement into a list.
+Next, to parse the body of the if statement, we loop continuously until we encounter an `endif` token, while adding each statement into a list. Note that we also have to manually increment the pointer as it is not being fed through the main parser loop.
 
 ```
 var body = new List<Expression>();
@@ -633,7 +633,7 @@ while (!IsLastToken() && Tokens[Current].Type is not TokenType.Endif) {
 }
 ```
 
-Finally, we return a new if expression with the condition and body.
+Finally, once the while loop terminates, we return a new if expression with the condition and body.
 
 ```
 return new IfStatement(condition, body, null);

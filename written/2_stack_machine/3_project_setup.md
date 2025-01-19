@@ -1,6 +1,8 @@
 ## Project Setup
 
-Navigate to a folder where you want to the project to be saved. You can create a new C# console application by opening a terminal and entering the following.
+To get started, we need to set up a new C# console application. First, navigate to the folder where you want to create your new project. If needed, create a new folder to keep your work organised.
+
+Open a terminal or code editor in your desired folder and enter the following command to create a new C# console app.
 
 ```
 dotnet new console
