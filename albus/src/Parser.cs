@@ -33,7 +33,7 @@ public class Parser {
     }
 
     private Expression ParseExpression() {
-        return ParseTerm();
+        return ParseLogicalOr();
     }
 
     private Expression ParseVariableDeclaration() {
@@ -61,6 +61,18 @@ public class Parser {
         return new VariableDeclaration(identifier, value);
     }
 
+    private Expression ParseLogicalOr() {
+        var left = ParsePrimary();
+
+        while (Match(TokenType.Or)) {
+            Token op = Tokens[Current++];
+            var right = ParsePrimary();
+            left = new BinaryExpression(left, op, right);
+        }
+
+        return left;
+    }
+
     private Expression ParseTerm() {
         var left = ParseFactor();
 
@@ -76,7 +88,7 @@ public class Parser {
     private Expression ParseFactor() {
         var left = ParsePrimary();
 
-        while (Match(TokenType.Star) || Match(TokenType.Slash)) {
+        while (Match(TokenType.Star) || Match(TokenType.Slash) || Match(TokenType.Modulo)) {
             Token op = Tokens[Current++];
             var right = ParsePrimary();
             left = new BinaryExpression(left, op, right);

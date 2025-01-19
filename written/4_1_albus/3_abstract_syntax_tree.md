@@ -380,7 +380,7 @@ Expr: x = "Hello, World!"
 
 We are now going to revisit the concept of precedence, which you may recall from the expression evaluator section. The only difference this time is that rather than creating the expressions and then evaluating them, we are just creating them. The evaluation will be done by the interpreter rather than the parser. 
 
-We'll modify our parser by introducing the `ParseTerm` method for handling binary expressions. This method will handle additive operators as they of the same precedence level.
+We'll modify our parser by introducing the `ParseTerm` method for handling binary expressions. This method will handle additive operators such as plus and minus as they of the same precedence level.
 
 Hopefully you can recognise some of the code from the method below. We attempt to parse a number first, then continue to parse primary expressions as long as the current operator is a plus or minus. Finally, we return the generated binary expression.
 
@@ -398,13 +398,13 @@ private Expression ParseTerm() {
 }
 ```
 
-Similarly, the implementation for multiplicative expressions is as follows.
+Similarly, the implementation for multiplicative expressions is the same except we check for the star and slash tokens.
 
 ```
 private Expression ParseFactor() {
     var left = ParsePrimary();
 
-    while (Match(TokenType.Star) || Match(TokenType.Slash)) {
+    while (Match(TokenType.Star) || Match(TokenType.Slash) || Match(TokenType.Modulo)) {
         Token op = Tokens[Current++];
         var right = ParsePrimary();
         left = new BinaryExpression(left, op, right);
@@ -435,3 +435,4 @@ Expr: x = (((2 + 4) - (4 * 32)) + (1 * 2))
 ```
 
 As you can see, the brackets show us the actual precedence of the expressions, with the multiplicative expressions being grouped separately.
+

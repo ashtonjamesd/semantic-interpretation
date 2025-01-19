@@ -19,6 +19,8 @@ public sealed class Lexer(string source, bool debug) {
         ["endif"] = TokenType.Endif,
         ["return"] = TokenType.Return,
         ["void"] = TokenType.Void,
+        ["or"] = TokenType.Or,
+        ["and"] = TokenType.And,
     };
 
     private static readonly Dictionary<char, TokenType> SingleTokens = new() {

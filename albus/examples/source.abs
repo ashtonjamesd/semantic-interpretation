@@ -1,1 +1,1 @@
-let x = 2 + 4 - 4 * 32 + 1 * 2;
+let x = true or false or true or true;

@@ -36,6 +36,8 @@ public enum TokenType {
     If,
     Endif,
     Return,
+    Or,
+    And,
 
     BadToken,
     Eof
