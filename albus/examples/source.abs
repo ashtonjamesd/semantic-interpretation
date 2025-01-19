@@ -1,1 +1,1 @@
-let x = true or false or true or true;
+let x = true or false or true or true or false;

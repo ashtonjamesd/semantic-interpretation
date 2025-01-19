@@ -62,11 +62,23 @@ public class Parser {
     }
 
     private Expression ParseLogicalOr() {
-        var left = ParsePrimary();
+        var left = ParseLogicalAnd();
 
         while (Match(TokenType.Or)) {
             Token op = Tokens[Current++];
-            var right = ParsePrimary();
+            var right = ParseLogicalAnd();
+            left = new BinaryExpression(left, op, right);
+        }
+
+        return left;
+    }
+
+    private Expression ParseLogicalAnd() {
+        var left = ParseTerm();
+
+        while (Match(TokenType.And)) {
+            Token op = Tokens[Current++];
+            var right = ParseTerm();
             left = new BinaryExpression(left, op, right);
         }
 
