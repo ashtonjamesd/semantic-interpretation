@@ -58,9 +58,9 @@ The parser will follow a similar structure to the lexer, consisting of a current
 
 ```
 public class Parser {
-    private readonly List<Token> Tokens;
-    private int Current;
-    private readonly Ast Ast = new();
+    public readonly List<Token> Tokens;
+    public int Current;
+    public readonly Ast Ast = new();
 
     public Parser(List<Token> tokens) {
         Tokens = tokens;
@@ -436,10 +436,9 @@ Expr: x = (((2 + 4) - (4 * 32)) + (1 * 2))
 
 As you can see, the brackets show us the actual precedence of the expressions, with the multiplicative expressions being grouped separately.
 
-
 Now we want our parser to recognise logical expressions involving `and` and `or` tokens. These are slightly simpler to implement as they involve checking the one token type. In boolean logic, logical `and` takes precedence over logical `or`, meaning that the method parsing `or` expressions will call the method parsing `and` expressions to enforce this precedence.
 
-Here is the implementation for the logical `and` parsing.
+Here is the implementation for the parsing logical `and` expressions.
 
 ```
 private Expression ParseLogicalAnd() {
@@ -455,7 +454,7 @@ private Expression ParseLogicalAnd() {
 }
 ```
 
-Likewise, logical `or`:
+Similarly, for logical `or` expressions, the method calls `ParseLogicalAnd` to ensure `and` expressions are evaluated first.
 
 ```
 private Expression ParseLogicalOr() {
@@ -471,29 +470,27 @@ private Expression ParseLogicalOr() {
 }
 ```
 
-Logical or takes precedence over logical and mainly because this is how it works in modern programming languages. This stems from C++, which stemmed from C, which stemmed from mathematics.
-
-Take the following expression:
+In Boolean logic, `and` takes precedence over `or`. This is the same precedence we expect in most programming languages, including those derived from C++, which in turn, has its roots in mathematical logic. For instance, consider the following expressions:
 
 ```
 let x = 2 == 2 and true;
 ```
 
-You would expect this particular expression to be evaluated with the following precedence:
+You would expect this to be parsed as:
 
 ```
 Expr: x = ((2 == 2) and True)
 ```
 
-However, if we place logical and precedence over equality, we would get this:
+This makes sense logically and aligns with how most programming languages interpret such expressions. If we were to incorrectly place logical `and` precedence over equality, we would end up with the following:
 
 ```
 Expr: x = (2 == (2 and True))
 ```
 
-The first expression is a lot more natural and makes more sense to the programmer.
+The first expression is a lot more intuitive and meaningful.
 
-Next, lets implement the equality expression parsing.
+Next, we need to implement parsing for equality expressions, such as equality and inequality operators.
 
 ```
 private Expression ParseEquality() {
@@ -509,7 +506,7 @@ private Expression ParseEquality() {
 }
 ```
 
-Can you see the pattern in all of these? Once you can visualise and comprehend the recursive nature of the methods, it starts to all fits together.
+Can you see the pattern in all of these methods? Once you can visualise and comprehend the recursive nature of the methods, it starts to all fits together.
 
 The next type of binary expression we will parse is the comparison expression. This involves the four greater/less than operators and will take precedence over equality expressions.
 
@@ -528,15 +525,121 @@ private Expression ParseComparison() {
 }
 ```
 
-
-Lets test it with a group of expression
+Now that we have implemented the necessary parsing methods, we can test them using an example expression:
 
 ```
 let x = 2 > 4 + 1 or 2 == 4 and 2 != 2;
 ```
 
-We can see it has correctly parsed it in accordance with the precedence defined.
+With the precedence rules in place, this expression is parsed correctly as follows:
 
 ```
 Expr: x = ((2 > (4 + 1)) or ((2 == 4) and (2 != 2)))
+```
+
+The next part of our parse we are going to construct will handle the conditional if statements in our code. The syntax for these are as follows.
+
+```
+if condition then
+ // ...
+endif
+```
+
+They can also have additional branches with:
+
+```
+if condition then
+ // ...
+elseif condition then
+  // ...
+else then
+  // ...
+endif
+```
+
+Like the variable declaration, we are going to create a separate method to handle the parsing of the if statement.
+
+We add another pattern into the `ParseStatement` method for the parser to attempt to parse the conditional.
+
+```
+TokenType.If => ParseIfStatement(),
+```
+
+Additionally, we need to create a class to represent an if statement expression. Firstly, lets break down the important parts of an if statement.
+
+```
+if condition then
+    // body
+endif
+```
+
+The key components of an `if` statement are the condition and the body. In its simplest form, the statement consists of a condition followed by a body of code that executes if the condition evaluates to true. However, they can also be extended with one or more `else if` branches, each with its own condition and associated body of code. While each branch has a separate condition, it is part of the original if statement and should be parsed within the same structure.
+
+The condition part can be represented with an `Expression`, which will evaluate to a Boolean. The body can be represented as a list of `Expression` objects. Finally, the alternate branch can be represented as another nested if statement inside the class. Note that this nested statement should be nullable as an additional branch is always optional.
+
+
+```
+public class IfStatement : Expression {
+    public readonly Expression Condition;  // The condition (expression) of the if statement
+    public readonly List<Expression> Body;  // The body (list of expressions) of the if statement
+    public readonly IfStatement? Alternate;  // The optional 'else if' or 'else' part (nested IfStatement)
+
+    public IfStatement(Expression condition, List<Expression> body, IfStatement? alternate) {
+        Condition = condition;
+        Body = body;
+        Alternate = alternate;
+    }
+}
+```
+
+Now lets implement it.
+
+We start by advancing past the `if` token.
+
+```
+private Expression ParseIfStatement() {
+    Current++;
+
+    // ...
+}
+```
+
+Next, we parse an expression for the condition and perform an error check in case the expression is invalid.
+
+```
+var condition = ParseExpression();
+if (HasError) {
+    return ExpressionError("invalid condition in if statement");
+}
+```
+
+Next, we enforce the `then` syntactic rule.
+
+```
+if (!Expect(TokenType.Then, "'then' after if statement condition")) {
+    return ExpressionError();
+}
+```
+
+Next, to parse the body of the if statement, we loop continuously until we encounter an `endif` token, while adding each statement into a list.
+
+```
+var body = new List<Expression>();
+while (!IsLastToken() && Tokens[Current].Type is not TokenType.Endif) {
+    var statement = ParseStatement();
+    Current++;
+
+    body.Add(statement);
+}
+```
+
+Finally, we return a new if expression with the condition and body.
+
+```
+return new IfStatement(condition, body, null);
+```
+
+Currently, we are passing in `null` for the if statement which means that we only currently support single-if statements. To add additional condition branching to the expression, we can start by adding the following code.
+
+```
 ```

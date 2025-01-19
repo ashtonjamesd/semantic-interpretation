@@ -1,1 +1,7 @@
-let x = 2 > 4 + 1 or 2 == 4 and 2 != 2;
+if true then
+    let x = 10;
+    
+    if false or true then 
+        let x = 10;
+    endif
+endif

@@ -21,8 +21,8 @@ public class LiteralExpression : Expression {
 }
 
 public class VariableDeclaration : Expression {
-    private readonly string Identifier;
-    private readonly Expression Value;
+    public readonly string Identifier;
+    public readonly Expression Value;
 
     public VariableDeclaration(string identifier, Expression value) {
         Identifier = identifier;
@@ -35,9 +35,9 @@ public class VariableDeclaration : Expression {
 }
 
 public class BinaryExpression : Expression {
-    private readonly Expression Left;
-    private readonly Token Operator;
-    private readonly Expression Right;
+    public readonly Expression Left;
+    public readonly Token Operator;
+    public readonly Expression Right;
 
     public BinaryExpression(Expression left, Token op, Expression right) {
         Left = left;
@@ -50,3 +50,19 @@ public class BinaryExpression : Expression {
     }
 }
 
+public class IfStatement : Expression {
+    public readonly Expression Condition;
+    public readonly List<Expression> Body;
+    public readonly IfStatement? Alternate;
+
+    public IfStatement(Expression condition, List<Expression> body, IfStatement? alternate) {
+        Condition = condition;
+        Body = body;
+        Alternate = alternate;
+    }
+
+    public override string ToString() {
+        string bodyStr = string.Join("\n", Body.Select(b => b.ToString()));
+        return $"if {Condition} then \n{bodyStr}\n";
+    }
+}

@@ -34,6 +34,8 @@ public enum TokenType {
     Mut,
     While,
     If,
+    Elseif,
+    Then,
     Endif,
     Return,
     Or,

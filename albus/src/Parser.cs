@@ -28,6 +28,7 @@ public class Parser {
     private Expression ParseStatement() {
         return Tokens[Current].Type switch {
             TokenType.Let => ParseVariableDeclaration(),
+            TokenType.If => ParseIfStatement(),
             _ => ParseExpression()
         };
     }
@@ -59,6 +60,29 @@ public class Parser {
 
         Current--;
         return new VariableDeclaration(identifier, value);
+    }
+
+    private Expression ParseIfStatement() {
+        Current++;
+
+        var condition = ParseExpression();
+        if (HasError) {
+            return ExpressionError("invalid condition in if statement");
+        }
+
+        if (!Expect(TokenType.Then, "'then' after if statement condition")) {
+            return ExpressionError();
+        }
+
+        var body = new List<Expression>();
+        while (!IsLastToken() && Tokens[Current].Type is not TokenType.Endif) {
+            var statement = ParseStatement();
+            Current++;
+
+            body.Add(statement);
+        }
+
+        return new IfStatement(condition, body, null);
     }
 
     private Expression ParseLogicalOr() {
