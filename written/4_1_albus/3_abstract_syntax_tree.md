@@ -436,3 +436,107 @@ Expr: x = (((2 + 4) - (4 * 32)) + (1 * 2))
 
 As you can see, the brackets show us the actual precedence of the expressions, with the multiplicative expressions being grouped separately.
 
+
+Now we want our parser to recognise logical expressions involving `and` and `or` tokens. These are slightly simpler to implement as they involve checking the one token type. In boolean logic, logical `and` takes precedence over logical `or`, meaning that the method parsing `or` expressions will call the method parsing `and` expressions to enforce this precedence.
+
+Here is the implementation for the logical `and` parsing.
+
+```
+private Expression ParseLogicalAnd() {
+    var left = ParseTerm();
+
+    while (Match(TokenType.And)) {
+        Token op = Tokens[Current++];
+        var right = ParseTerm();
+        left = new BinaryExpression(left, op, right);
+    }
+
+    return left;
+}
+```
+
+Likewise, logical `or`:
+
+```
+private Expression ParseLogicalOr() {
+    var left = ParseLogicalAnd();
+
+    while (Match(TokenType.Or)) {
+        Token op = Tokens[Current++];
+        var right = ParseLogicalAnd();
+        left = new BinaryExpression(left, op, right);
+    }
+
+    return left;
+}
+```
+
+Logical or takes precedence over logical and mainly because this is how it works in modern programming languages. This stems from C++, which stemmed from C, which stemmed from mathematics.
+
+Take the following expression:
+
+```
+let x = 2 == 2 and true;
+```
+
+You would expect this particular expression to be evaluated with the following precedence:
+
+```
+Expr: x = ((2 == 2) and True)
+```
+
+However, if we place logical and precedence over equality, we would get this:
+
+```
+Expr: x = (2 == (2 and True))
+```
+
+The first expression is a lot more natural and makes more sense to the programmer.
+
+Next, lets implement the equality expression parsing.
+
+```
+private Expression ParseEquality() {
+    var left = ParseComparison();
+
+    while (Match(TokenType.DoubleEquals) || Match(TokenType.NotEquals)) {
+        Token op = Tokens[Current++];
+        var right = ParseComparison();
+        left = new BinaryExpression(left, op, right);
+    }
+
+    return left;
+}
+```
+
+Can you see the pattern in all of these? Once you can visualise and comprehend the recursive nature of the methods, it starts to all fits together.
+
+The next type of binary expression we will parse is the comparison expression. This involves the four greater/less than operators and will take precedence over equality expressions.
+
+```
+private Expression ParseComparison() {
+    var left = ParseTerm();
+
+    while (Match(TokenType.GreaterThan) || Match(TokenType.LessThan) || 
+            Match(TokenType.GreaterThanEquals) || Match(TokenType.LessThanEquals)) {
+        Token op = Tokens[Current++];
+        var right = ParseTerm();
+        left = new BinaryExpression(left, op, right);
+    }
+
+    return left;
+}
+```
+
+
+Lets test it with a group of expression
+
+```
+let x = 2 > 4 + 1 or 2 == 4 and 2 != 2;
+```
+
+We can see it has correctly parsed it in accordance with the precedence defined.
+
+```
+Expr: x = ((2 > (4 + 1)) or ((2 == 4) and (2 != 2)))
+```

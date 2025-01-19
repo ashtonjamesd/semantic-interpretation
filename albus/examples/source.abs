@@ -1,1 +1,1 @@
-let x = true or false or true or true or false;
+let x = 2 > 4 + 1 or 2 == 4 and 2 != 2;

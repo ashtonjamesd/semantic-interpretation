@@ -74,9 +74,34 @@ public class Parser {
     }
 
     private Expression ParseLogicalAnd() {
-        var left = ParseTerm();
+        var left = ParseEquality();
 
         while (Match(TokenType.And)) {
+            Token op = Tokens[Current++];
+            var right = ParseEquality();
+            left = new BinaryExpression(left, op, right);
+        }
+
+        return left;
+    }
+
+    private Expression ParseEquality() {
+        var left = ParseComparison();
+
+        while (Match(TokenType.DoubleEquals) || Match(TokenType.NotEquals)) {
+            Token op = Tokens[Current++];
+            var right = ParseComparison();
+            left = new BinaryExpression(left, op, right);
+        }
+
+        return left;
+    }
+
+    private Expression ParseComparison() {
+        var left = ParseTerm();
+
+        while (Match(TokenType.GreaterThan) || Match(TokenType.LessThan) || 
+                Match(TokenType.GreaterThanEquals) || Match(TokenType.LessThanEquals)) {
             Token op = Tokens[Current++];
             var right = ParseTerm();
             left = new BinaryExpression(left, op, right);
