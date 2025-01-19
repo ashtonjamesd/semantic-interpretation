@@ -37,25 +37,23 @@ public class Parser {
     }
 
     private Expression ParseVariableDeclaration() {
-        if (!Expect(TokenType.Let, "let")) {
-            return ExpressionError();
-        }
+        Current++;
 
         var identifier = Tokens[Current].Lexeme;
-        if (!Expect(TokenType.Identifier, "identifier")) {
+        if (!Expect(TokenType.Identifier, "identifier after 'let'")) {
             return ExpressionError();
         }
 
-        if (!Expect(TokenType.SingleEquals, "=")) {
+        if (!Expect(TokenType.SingleEquals, "'=' after identifier")) {
             return ExpressionError();
         }
 
         var value = ParseExpression();
         if (HasError) {
-            return ExpressionError("invalid expression in variable declaration");
+            return ExpressionError("expected expression in variable declaration");
         }
 
-        if (!Expect(TokenType.SemiColon, ";")) {
+        if (!Expect(TokenType.SemiColon, "';' after expression")) {
             return ExpressionError();
         }
 
@@ -71,13 +69,13 @@ public class Parser {
             TokenType.Char => new LiteralExpression(char.Parse(token.Lexeme)),
             TokenType.True or TokenType.False => new LiteralExpression(bool.Parse(token.Lexeme)),
             TokenType.Identifier => new LiteralExpression(token.Lexeme),
-            _ => ExpressionError($"Unknown primary expression: {token.Lexeme}")
+            _ => ExpressionError()
         };
     }
 
     private bool Expect(TokenType type, string value) {
         if (IsLastToken() || Tokens[Current].Type != type) {
-            return ParseError($"expected '{value}'");
+            return ParseError($"expected {value}");
         }
 
         Current++;

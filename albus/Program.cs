@@ -32,6 +32,9 @@ internal class Program {
 
         var parser = new Parser(tokens);
         var ast = parser.ParseAst();
+        if (parser.HasError) {
+            return;
+        }
 
         foreach (var expr in ast.Body) {
             Console.WriteLine($"Expr: {expr}");

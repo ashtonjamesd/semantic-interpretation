@@ -76,9 +76,23 @@ public class Parser {
 
 In our parser, each expression will have a dedicated method to parse and return its corresponding type of expression. For instance, `ParseVariableDeclaration`, and `ParseLiteral`, etc.
 
+We can add the following code in our main method for the parser.
+
+```
+var parser = new Parser(tokens);
+var ast = parser.ParseAst();
+if (parser.HasError) {
+    return;
+}
+
+foreach (var expr in ast.Body) {
+    Console.WriteLine($"Expr: {expr}");
+}
+```
+
 The method below demonstrates how we parse primary expressions - the most basic building block of expressions and statements. Primary expressions include literals such as strings, integers, characters, and booleans. They are what you would call 'leaf nodes' as they are at the bottom of the AST and cannot be decomposed further.
 
-In the method below, we simply check the token type and then parse it into the appropriate C# data type.
+We simply check the token type, parse it into the appropriate C# data type, and return a new literal expression with the value of the token.
 
 ```
 private Expression ParsePrimary() {
@@ -159,24 +173,35 @@ private bool IsLastToken() {
 
 <br/>
 
-Next, we're going to parse the first statement in our language: the variable declaration.
+Next, we're going to parse the first statement in our language: the variable declaration. 
+
+In Albus, variables are declared using the 'let' keyword, followed by an identifier, an equals sign to assign a value, and finally, the value itself. The statement ends with a semicolon. Here’s an example of a variable declaration in Albus:
+
+```
+let x = 10;
+```
+
+We will start by creating a new method for parsing variable declarations.
 
 ```
 private Expression ParseVariableDeclaration() {
+    // this statement will be replaced later as we know it is already a 'let' token
     if (!Expect(TokenType.Let)) {
         return new BadExpression();
     }
+
+    // ...
 }
 ```
 
 We are again going to employ another helper method that will check the type of the current token. This method offers a graceful way to enforce the syntax of our language and alert the programmer of any syntactical errors. We will call this method `Expect` as we are expecting a token with a particular type to appear at that point.
 
-Before accessing the current token, we check if we are currently within the bounds of the token list. If so, we perform the comparison, otherwise we return the error (false). If it is a match, we increment `Current` as we no longer need this token as it is there to simply enforce the syntax of our language.
+Before accessing the current token, we check if we are currently within the bounds of the token list. If so, we perform the comparison, otherwise we return the error (false). If it is a match, we increment `Current` as we no longer need this token as it is there to simply enforce the syntax of our language. We are also going to pass in a string to be displayed in the expected error output.
 
 ```
-private bool Expect(TokenType type) {
+private bool Expect(TokenType type, String value) {
     if (IsLastToken() || Tokens[Current].Type != type) {
-        return ParseError($"expected '{type}'");
+        return ParseError($"expected {value}");
     }
 
     Current++;
@@ -253,13 +278,103 @@ Assume the `Expect` method returns false. An error message will be outputted for
 
 <br/>
 
-Lets return to parsing the variable declaration. We can update the snippet to call our new error method instead of returning a bad expression instance directly.
+Lets return to parsing the variable declaration. We can update the snippet to call our new error reporting method instead of returning a new bad expression instance directly.
 
 ```
 private Expression ParseVariableDeclaration() {
-    if (!Expect(TokenType.Let)) {
+    Current++; // we already know it is a 'Let' token, so we simply advance past it
+
+    var identifier = Tokens[Current].Lexeme;
+    if (!Expect(TokenType.Identifier, "identifier after 'let'")) {
         return ExpressionError();
     }
+
+    return new BadExpression(); // temporary return
 }
 ```
+
+To test the error reporting, lets run the program with the input source below:
+
+```
+let
+```
+
+This should raise a parser error telling the user that an identifier was expected after the let.
+
+```
+parsing error: expected identifier after 'let' on line 1
+```
+
+As expected, the parser recognises that the token found after the 'let' was not the token expected when parsing a variable declaration. Now lets implement the rest of the variable parsing logic.
+
+After the identifier has been advanced past, we expect to find a single equals symbol.
+
+```
+if (!Expect(TokenType.SingleEquals, "'=' after identifier")) {
+    return ExpressionError();
+}
+```
+
+Next, we parse the actual expression that the variable has been assigned to.
+
+```
+var value = ParseExpression();
+if (HasError) {
+    return ExpressionError("expected expression in variable declaration");
+}
+```
+
+We perform a check on the `HasError` flag as something could have gone wrong in the `ParseExpression` method. Specifically when we are parsing a primary expression and the expression is not a valid primary expression.
+
+For instance, the following input:
+
+```
+let x = ;;
+```
+
+Will result in the following error:
+
+```
+parsing error: expected expression in variable declaration on line 1
+```
+
+Finally, we ensure the declaration ends with a semicolon and return a new instance of a variable declaration.
+
+```
+if (!Expect(TokenType.SemiColon, "';' after expression")) {
+    return ExpressionError();
+}
+
+return new VariableDeclaration(identifier, value);
+```
+
+To ensure that the parser attempts to parse the correct statement we need to create a method that directs the parsing logic based on the type of the token currently being examined. This method acts as a 'router', determining how to handle each token it encounters.
+
+If it finds a `Let` token, we attempt to parse a variable declaration, which is currently the only valid statement in our language. There will be others, but for now, it will attempt to parse an expression if any other tokens are encountered.
+
+The top level method `ParseAst` will now call `ParseStatement` instead of `ParseExpression` in the while loop.
+
+To implement this logic, we modify the top-level parsing method to call a new method, ParseStatement, in its while loop. This ensures that the parser correctly delegates token handling to the appropriate method. The reason we are choosing to implement a routing method like this is because it is easily extendible and gives a clear overview of which tokens map to what statements and expressions.
+
+```
+private Expression ParseStatement() {
+    return Tokens[Current].Type switch {
+        TokenType.Let => ParseVariableDeclaration(),
+        _ => ParseExpression()
+    };
+}
+```
+
+Now, lets try out our parser with the following input:
+
+```
+let x = "Hello, World!";
+```
+
+This results in:
+
+```
+Expr: x = "Hello, World!"
+```
+
 
