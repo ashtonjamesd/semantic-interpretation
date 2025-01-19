@@ -345,6 +345,7 @@ if (!Expect(TokenType.SemiColon, "';' after expression")) {
     return ExpressionError();
 }
 
+Current--; // we decrement this as it will be incremented anyway in the main while loop
 return new VariableDeclaration(identifier, value);
 ```
 
@@ -371,10 +372,8 @@ Now, lets try out our parser with the following input:
 let x = "Hello, World!";
 ```
 
-This results in:
+This results in the following expression;
 
 ```
 Expr: x = "Hello, World!"
 ```
-
-

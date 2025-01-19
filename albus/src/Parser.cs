@@ -33,7 +33,7 @@ public class Parser {
     }
 
     private Expression ParseExpression() {
-        return ParsePrimary();
+        return ParseTerm();
     }
 
     private Expression ParseVariableDeclaration() {
@@ -57,7 +57,20 @@ public class Parser {
             return ExpressionError();
         }
 
+        Current--;
         return new VariableDeclaration(identifier, value);
+    }
+
+    private Expression ParseTerm() {
+        var left = ParsePrimary();
+
+        while (Match(TokenType.Plus) || Match(TokenType.Minus)) {
+            Token op = Tokens[Current++];
+            var right = ParseExpression();
+            left = new BinaryExpression(left, op, right);
+        }
+
+        return left;
     }
 
     private Expression ParsePrimary() {
@@ -80,6 +93,11 @@ public class Parser {
 
         Current++;
         return true;
+    }
+
+    private bool Match(TokenType type) {
+        if (IsLastToken()) return false;
+        return Tokens[Current].Type == type;
     }
 
     private BadExpression ExpressionError(string? message = null) {

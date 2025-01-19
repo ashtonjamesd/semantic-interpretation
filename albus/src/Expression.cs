@@ -33,3 +33,20 @@ public class VariableDeclaration : Expression {
         return $"{Identifier} = {Value}";
     }
 }
+
+public class BinaryExpression : Expression {
+    private readonly Expression Left;
+    private readonly Token Operator;
+    private readonly Expression Right;
+
+    public BinaryExpression(Expression left, Token op, Expression right) {
+        Left = left;
+        Operator = op;
+        Right = right;
+    }
+
+    public override string ToString() {
+        return $"{Left} {Operator.Lexeme} {Right}";
+    }
+}
+
