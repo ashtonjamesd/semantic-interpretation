@@ -46,7 +46,7 @@ public class BinaryExpression : Expression {
     }
 
     public override string ToString() {
-        return $"{Left} {Operator.Lexeme} {Right}";
+        return $"({Left} {Operator.Lexeme} {Right})";
     }
 }
 

@@ -62,11 +62,23 @@ public class Parser {
     }
 
     private Expression ParseTerm() {
-        var left = ParsePrimary();
+        var left = ParseFactor();
 
         while (Match(TokenType.Plus) || Match(TokenType.Minus)) {
             Token op = Tokens[Current++];
-            var right = ParseExpression();
+            var right = ParseFactor();
+            left = new BinaryExpression(left, op, right);
+        }
+
+        return left;
+    }
+
+    private Expression ParseFactor() {
+        var left = ParsePrimary();
+
+        while (Match(TokenType.Star) || Match(TokenType.Slash)) {
+            Token op = Tokens[Current++];
+            var right = ParsePrimary();
             left = new BinaryExpression(left, op, right);
         }
 
