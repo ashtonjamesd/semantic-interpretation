@@ -1,7 +1,6 @@
-if true then
-    let x = 10;
-elseif false then
-  if true then endif
-else then
-    let x = 5;
-endif
+while true
+    if false then
+        break;
+    endif
+
+end

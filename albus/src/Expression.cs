@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+
 namespace albus.src;
 
 public abstract class Expression { }
@@ -62,13 +64,49 @@ public class IfStatement : Expression {
     }
 
     public override string ToString() {
-        string bodyStr = string.Join("\n", Body.Select(b => b.ToString()));
+        string bodyStr = string.Join("\n", Body.Select(b => "  " + b.ToString()));
 
         var ifWord = "if";
         if (Condition is null) {
             ifWord = "else";
         } 
 
-        return $"{ifWord} {Condition} then \n{bodyStr} \n{Alternate}\n";
+        return $"{ifWord} {Condition} then \n{bodyStr} \n{Alternate}  endif";
+    }
+}
+
+public class WhileStatement : Expression {
+    public readonly Expression Condition;
+    public readonly List<Expression> Body;
+
+    public WhileStatement(Expression condition, List<Expression> body) {
+        Condition = condition;
+        Body = body;
+    }
+
+    public override string ToString() {
+        string bodyStr = string.Join("\n", Body.Select(b => "  " + b.ToString()));
+
+        return $"while {Condition} \n{bodyStr} \nend";
+    }
+}
+
+public class BreakStatement : Expression {
+    public BreakStatement() {
+
+    }
+
+    public override string ToString() {
+        return "break";
+    }
+}
+
+public class ContinueStatement : Expression {
+    public ContinueStatement() {
+        
+    }
+
+    public override string ToString() {
+        return "continue";
     }
 }

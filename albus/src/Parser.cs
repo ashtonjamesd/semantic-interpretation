@@ -29,6 +29,9 @@ public class Parser {
         return Tokens[Current].Type switch {
             TokenType.Let => ParseVariableDeclaration(),
             TokenType.If => ParseIfStatement(),
+            TokenType.While => ParseWhileStatement(),
+            TokenType.Break => ParseBreakStatement(),
+            TokenType.Continue => ParseContinueStatement(),
             _ => ParseExpression()
         };
     }
@@ -107,6 +110,47 @@ public class Parser {
         }
 
         return new IfStatement(condition, ifBody, alternate);
+    }
+
+    private Expression ParseWhileStatement() {
+        Current++;
+
+        var condition = ParseExpression();
+        if (HasError) {
+            return ExpressionError("invalid condition in while statement");
+        }
+
+        List<Expression> body = [];
+        while (!IsLastToken() && !Match(TokenType.End)) {
+            var statement = ParseStatement();
+            body.Add(statement);
+
+            Current++;
+        }
+
+        return new WhileStatement(condition, body);
+    }
+
+    private Expression ParseBreakStatement() {
+        Current++;
+
+        if (!Expect(TokenType.SemiColon, "';' after 'break'")) {
+            return ExpressionError();
+        }
+
+        Current--;
+        return new BreakStatement();
+    }
+
+    private Expression ParseContinueStatement() {
+        Current++;
+
+        if (!Expect(TokenType.SemiColon, "';' after 'continue'")) {
+            return ExpressionError();
+        }
+
+        Current--;
+        return new ContinueStatement();
     }
 
     private Expression ParseLogicalOr() {
