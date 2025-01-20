@@ -74,15 +74,39 @@ public class Parser {
             return ExpressionError();
         }
 
-        var body = new List<Expression>();
-        while (!IsLastToken() && Tokens[Current].Type is not TokenType.Endif) {
+        var ifBody = new List<Expression>();
+        while (!IsLastToken() && CurrentToken().Type is not (TokenType.Endif or TokenType.Elseif or TokenType.Else)) {
             var statement = ParseStatement();
             Current++;
 
-            body.Add(statement);
+            ifBody.Add(statement);
         }
 
-        return new IfStatement(condition, body, null);
+        IfStatement? alternate = null;
+        if (!IsLastToken()) {
+            if (Match(TokenType.Elseif)) {
+                alternate = (IfStatement)ParseIfStatement();
+            } 
+            else if (Match(TokenType.Else)) {
+                Current++;
+
+                if (!Expect(TokenType.Then, "'then' after if statement condition")) {
+                    return ExpressionError();
+                }
+
+                var elseBody = new List<Expression>();
+                while (!IsLastToken() && CurrentToken().Type is not TokenType.Endif) {
+                    var statement = ParseStatement();
+                    Current++;
+
+                    elseBody.Add(statement);
+                }
+
+                alternate = new IfStatement(null, elseBody, null);
+            }
+        }
+
+        return new IfStatement(condition, ifBody, alternate);
     }
 
     private Expression ParseLogicalOr() {
@@ -172,7 +196,7 @@ public class Parser {
     }
 
     private bool Expect(TokenType type, string value) {
-        if (IsLastToken() || Tokens[Current].Type != type) {
+        if (IsLastToken() || CurrentToken().Type != type) {
             return ParseError($"expected {value}");
         }
 
@@ -183,6 +207,10 @@ public class Parser {
     private bool Match(TokenType type) {
         if (IsLastToken()) return false;
         return Tokens[Current].Type == type;
+    }
+
+    private Token CurrentToken() {
+        return Tokens[Current];
     }
 
     private BadExpression ExpressionError(string? message = null) {

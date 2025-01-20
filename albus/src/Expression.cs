@@ -51,11 +51,11 @@ public class BinaryExpression : Expression {
 }
 
 public class IfStatement : Expression {
-    public readonly Expression Condition;
+    public readonly Expression? Condition;
     public readonly List<Expression> Body;
     public readonly IfStatement? Alternate;
 
-    public IfStatement(Expression condition, List<Expression> body, IfStatement? alternate) {
+    public IfStatement(Expression? condition, List<Expression> body, IfStatement? alternate) {
         Condition = condition;
         Body = body;
         Alternate = alternate;
@@ -63,6 +63,12 @@ public class IfStatement : Expression {
 
     public override string ToString() {
         string bodyStr = string.Join("\n", Body.Select(b => b.ToString()));
-        return $"if {Condition} then \n{bodyStr}\n";
+
+        var ifWord = "if";
+        if (Condition is null) {
+            ifWord = "else";
+        } 
+
+        return $"{ifWord} {Condition} then \n{bodyStr} \n{Alternate}\n";
     }
 }

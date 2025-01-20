@@ -35,6 +35,7 @@ public enum TokenType {
     While,
     If,
     Elseif,
+    Else,
     Then,
     Endif,
     Return,

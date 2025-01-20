@@ -1,7 +1,7 @@
 if true then
     let x = 10;
-    
-    if false or true then 
-        let x = 10;
-    endif
+elseif false then
+  if true then endif
+else then
+    let x = 5;
 endif

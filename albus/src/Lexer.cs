@@ -23,6 +23,7 @@ public sealed class Lexer(string source, bool debug) {
         ["and"] = TokenType.And,
         ["then"] = TokenType.Then,
         ["elseif"] = TokenType.Elseif,
+        ["else"] = TokenType.Else,
     };
 
     private static readonly Dictionary<char, TokenType> SingleTokens = new() {

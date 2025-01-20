@@ -16,7 +16,7 @@ internal class Program {
 
         bool isDebug = false;
         if (args.Length == 2) {
-            if (args[1] == "-d") isDebug = true;
+            if (args[1] is "-d") isDebug = true;
             else {
                 Console.WriteLine($"invalid flag '{args[1]}'");
             }
