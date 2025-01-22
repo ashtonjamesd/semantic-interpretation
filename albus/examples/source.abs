@@ -1,6 +1,5 @@
-while true
-    if false then
-        break;
-    endif
-
-end
+if false then
+    break;
+else if true then
+    break;
+endif

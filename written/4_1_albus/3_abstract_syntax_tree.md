@@ -639,7 +639,68 @@ Finally, once the while loop terminates, we return a new if expression with the 
 return new IfStatement(condition, body, null);
 ```
 
-Currently, we are passing in `null` for the if statement which means that we only currently support single-if statements. To add additional condition branching to the expression, we can start by adding the following code.
+Currently, we are passing in `null` for the if statement which means that we only currently support single-if statements. To add additional condition branching to the expression, we need to make a few changes to our existing code. 
+
+We will start by renaming `body` variable to `ifBody` as we are going to have a separate body for else and this makes what it is it a lot clearer.
 
 ```
+var ifBody = new List<Expression>();
+```
+
+We also need to update the while condition to look for not just the `Endif` token, but the alternative branching tokens, such as `ElseIf`.
+
+```
+!IsLastToken() && CurrentToken().Type is not (TokenType.Endif or TokenType.Elseif or TokenType.Else)
+```
+
+After the loop ends, it means we have either encountered an `Endif`, `ElseIf`, or `Else` token (or the parser has reached the end of the program). Now, we parse the else-if branch the exact same way as the `if` branch, the only difference being that it is an alternate path.
+
+We start by defining an `IfStatement` to hold the data about the potential else-if branch. We set it to null as you are able to have a singular if statement with no additional branches.
+
+```
+IfStatement? alternate = null;
+```
+
+Since the parsing is identical, we can recursively call the method that parses an if statement. This will handle the parsing for us, all we have to do is check the parser is not at the end of the program and the current token is the start of an else-if branch.
+
+```
+if (!IsLastToken()) {
+    if (Match(TokenType.Elseif)) {
+        alternate = (IfStatement)ParseIfStatement();
+    } 
+}
+```
+
+We can now return a new if statement, passing in the alternate and optional if-else branch into the expression.
+
+```
+return new IfStatement(condition, ifBody, alternate);
+```
+
+Parsing the `else` is slightly more complex as we are unable to use the recursion method due to the loop that parses the else body requiring a different condition. However, it is mostly stuff we have already written.
+
+We start by checking if the current token is an `Else` token, incrementing past it if that is true. Then, we enforce the syntax of a `Then` appearing after the `Else` keyword.
+
+We define another list to hold all of the expressions that will make up the body of the else statement. Then, similarly to the loop near the beginning of the method, we parse each statement inside the body and add to the list.
+
+Finally, we set the alternate to a new `IfStatement` expression and pass the condition in as `null`. We do this because an else has no condition, it only executes if none of the above branches have evaluated to true. The alternate branch is also passed in as `null` as an else branch marks the end of the if statement.
+
+```
+else if (Match(TokenType.Else)) {
+    Current++;
+
+    if (!Expect(TokenType.Then, "'then' after if statement condition")) {
+        return ExpressionError();
+    }
+
+    var elseBody = new List<Expression>();
+    while (!IsLastToken() && CurrentToken().Type is not TokenType.Endif) {
+        var statement = ParseStatement();
+        Current++;
+
+        elseBody.Add(statement);
+    }
+
+    alternate = new IfStatement(null, elseBody, null);
+}
 ```
