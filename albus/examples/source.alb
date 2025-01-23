@@ -1,1 +1,5 @@
-let x = not false;
+let x = true then 1 
+            else true then 1
+            else not true then 1 + 1
+            else not false or true then 2 * 4 % 1
+            else 0;

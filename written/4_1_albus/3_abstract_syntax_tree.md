@@ -921,3 +921,89 @@ Now, when we type the following statement, the parser will find the unary `not` 
 ```
 let x = not true; // false
 ```
+
+Next, we will learn how to parse a ternary operator expression. This is a special type of expression that is essentially shorthand for an if-else block.
+
+For instance, the following snippet:
+
+```
+let x = condition ? 1 : 0;
+```
+
+Is equivalent to the if-else block below. It is just a more concise way of assigning the value.
+
+```
+let x;
+if (condition) {
+    x = 1;
+} else {
+    x = 0;
+}
+```
+
+In our language, a ternary expression consists of three distinct components: the condition to be evaluated, the expression to be assigned if the condition is true, and the expression to be assigned if the condition is false.
+
+The class implementation for this is as follows:
+
+```
+public class TernaryExpression : Expression {
+    public readonly Expression Condition;
+    public readonly Expression TrueBranch;
+    public readonly Expression FalseBranch;
+
+    public TernaryExpression(Expression condition, Expression trueBranch, Expression falseBranch) {
+        Condition = condition;
+        TrueBranch = trueBranch;
+        FalseBranch = falseBranch;
+    }
+
+    public override string ToString() {
+        return $"{Condition} then {TrueBranch} else {FalseBranch}";
+    }
+}
+```
+
+The ternary operator acts as a high-level condition expression that encompasses other expressions, therefore it should have a very low precedence compared to everything else.
+
+Given this, we can update the `ParseExpression` method to call a new method: `ParseTernary`, which will have a precedence that of just above the logical or parsing method.
+
+We start by parsing the condition that the ternary operator will evaluate. If the next token is not a `Then`, then the expression is not a ternary expression, therefore we simply return the parsed condition.
+
+```
+private Expression ParseTernary() {
+    var condition = ParseLogicalOr();
+
+    if (Match(TokenType.Then)) {
+        // ...
+    }
+
+    return condition;
+}
+```
+
+Now, we first increment past the `Then` token. We then parse the first condition for the true-branch. We then enforce the `Else` token syntax and parse another expression for the false-branch. Lastly, we return a new ternary expression with the condition and branches.
+
+```
+Current++;
+var trueBranch = ParseExpression();
+
+if (!Expect(TokenType.Else, "'else' after ternary condition")) {
+    return ExpressionError();
+}
+
+var falseBranch = ParseExpression();
+return new TernaryExpression(condition, trueBranch, falseBranch);
+```
+
+Since we are calling the `ParseExpression` method for the true and false branches of the ternary, and due to the recursive nature of the parser, we are able to infinitely nest ternary expressions like this:
+
+```
+let x = true then 1 
+    else true then 1
+    else not true then 1 + 1
+    else not false or true then 2 * 4 % 1
+    else 0;
+
+```
+
+As you can see, the ternary expression is quite powerful and can change the way your code reads, for better or worse.

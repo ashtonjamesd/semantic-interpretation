@@ -27,17 +27,17 @@ public class Parser {
 
     private Expression ParseStatement() {
         return Tokens[Current].Type switch {
-            TokenType.Let => ParseVariableDeclaration(),
-            TokenType.If => ParseIfStatement(),
+            TokenType.Let   => ParseVariableDeclaration(),
+            TokenType.If    => ParseIfStatement(),
             TokenType.While => ParseWhileStatement(),
             TokenType.Break => ParseBreakStatement(),
-            TokenType.Next => ParseNextStatement(),
-            _ => ParseExpression()
+            TokenType.Next  => ParseNextStatement(),
+            _               => ParseExpression()
         };
     }
 
     private Expression ParseExpression() {
-        return ParseLogicalOr();
+        return ParseTernary();
     }
 
     private Expression ParseVariableDeclaration() {
@@ -151,6 +151,24 @@ public class Parser {
 
         Current--;
         return new NextStatement();
+    }
+
+    private Expression ParseTernary() {
+        var condition = ParseLogicalOr();
+
+        if (Match(TokenType.Then)) {
+            Current++;
+            var trueBranch = ParseExpression();
+
+            if (!Expect(TokenType.Else, "'else' after ternary condition")) {
+                return ExpressionError();
+            }
+
+            var falseBranch = ParseExpression();
+            return new TernaryExpression(condition, trueBranch, falseBranch);
+        }
+
+        return condition;
     }
 
     private Expression ParseLogicalOr() {

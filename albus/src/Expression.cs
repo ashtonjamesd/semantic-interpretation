@@ -66,6 +66,22 @@ public class UnaryExpression : Expression {
     }
 }
 
+public class TernaryExpression : Expression {
+    public readonly Expression Condition;
+    public readonly Expression TrueBranch;
+    public readonly Expression FalseBranch;
+
+    public TernaryExpression(Expression condition, Expression trueBranch, Expression falseBranch) {
+        Condition = condition;
+        TrueBranch = trueBranch;
+        FalseBranch = falseBranch;
+    }
+
+    public override string ToString() {
+        return $"{Condition} then {TrueBranch} else {FalseBranch}";
+    }
+}
+
 public class IfStatement : Expression {
     public readonly Expression? Condition;
     public readonly List<Expression> Body;
