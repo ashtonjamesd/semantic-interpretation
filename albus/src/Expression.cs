@@ -52,6 +52,20 @@ public class BinaryExpression : Expression {
     }
 }
 
+public class UnaryExpression : Expression {
+    public readonly Expression Left;
+    public readonly Token Operator;
+
+        public UnaryExpression(Expression left, Token op) {
+        Left = left;
+        Operator = op;
+    }
+
+    public override string ToString() {
+        return $"({Operator.Lexeme} {Left})";
+    }
+}
+
 public class IfStatement : Expression {
     public readonly Expression? Condition;
     public readonly List<Expression> Body;

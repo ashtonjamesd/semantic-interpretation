@@ -215,16 +215,27 @@ public class Parser {
     }
 
     private Expression ParseFactor() {
-        var left = ParsePrimary();
+        var left = ParseUnary();
 
         while (Match(TokenType.Star) || Match(TokenType.Slash) || Match(TokenType.Modulo)) {
             Token op = Tokens[Current++];
-            var right = ParsePrimary();
+            var right = ParseUnary();
             left = new BinaryExpression(left, op, right);
         }
 
         return left;
     }
+
+    private Expression ParseUnary() {
+        if (Match(TokenType.Minus) || Match(TokenType.Not)) {
+            Token op = Tokens[Current++];
+            var operand = ParseUnary();
+            return new UnaryExpression(operand, op);
+        }
+
+        return ParsePrimary();
+    }
+
 
     private Expression ParsePrimary() {
         var token = Tokens[Current++];

@@ -831,9 +831,93 @@ private Expression ParseBreakStatement() {
 
 ```
 
+A unary expression is an expression that only has one operand inside of it. For instance, in most languages, the `!` operator is a unary operator used to negate a logical expression.
 
+Because it does not follow the standard pattern of a binary expression, we need to create a new class for unary expressions to hold the operator and operand.
 
+We implement this as follows:
 
-TODO!
-  - Unary operator parsing
-  
+```
+public class UnaryExpression : Expression {
+    public readonly Expression Left;
+    public readonly Token Operator;
+
+    public UnaryExpression(Expression left, Token op) {
+        Left = left;
+        Operator = op;
+    }
+
+    public override string ToString() {
+        return $"({Operator.Lexeme} {Left})";
+    }
+}
+```
+
+Next, we should determine the precedence level for our unary operators. To make an informed decision, it’s helpful to write examples of these operators in various contexts and analyze how they should interact with other operators. Considering different scenarios allows us to choose the precedence that ensures intuitive and consistent behavior in the language.
+
+Take the following statement.
+
+```
+let x = -1 + 2;
+```
+
+This statement could be interpreted in two different ways depending on the precedence of the unary operator.
+
+In the case below, the negation is applied to the 1, resulting in the expression evaluating to 1. This behavior is typical, where the unary operators are given a higher precedence over arithmetic operators like plus and minus;
+
+```
+let x = (-1) + 2; // 1
+```
+
+The alternative way to parse this expression is by assigning a higher precedence to the plus operator. This means that the arithmetic expression will be evaluated first and then the result will be negated.
+
+```
+let x = -(1 + 2); // -3
+```
+
+Given this, the unary operator needs to have a higher precedence than factors and terms. Therefore, since the `ParseTerm` method calls `ParseFactor`, the next level of precedence show be the unary expression.
+
+The implementation for parsing a unary operator is as follows:
+
+```
+private Expression ParseUnary() {
+    if (Match(TokenType.Minus) || Match(TokenType.Not)) {
+        Token op = Tokens[Current++];
+        var operand = ParseUnary();
+        return new UnaryExpression(operand, op);
+    }
+
+    return ParsePrimary();
+}
+```
+We start by checking for the `Minus` and `Not` tokens. These are currently the only valid unary operators in our language. If none of these tokens are present we simply parse a primary expression as normal.
+
+Next, we save the operator token and attempt to parse another unary expression. This allows us to have nested unary expressions, for instance:
+
+```
+let x = not not not true; // amongst more practical uses
+```
+
+Finally, we return the new unary expression.
+
+We also update the `ParseFactor` method to call the `ParseUnary` methods instead of `ParsePrimary`.
+
+```
+    private Expression ParseFactor() {
+        var left = ParseUnary();
+
+        while (Match(TokenType.Star) // ...) {
+            var right = ParseUnary();
+
+            // ...
+        }
+
+        // ...
+    }
+```
+
+Now, when we type the following statement, the parser will find the unary `not` operator and attach it to the expression directly after it.
+
+```
+let x = not true; // false
+```

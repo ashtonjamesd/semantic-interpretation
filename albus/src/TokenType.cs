@@ -44,6 +44,7 @@ public enum TokenType {
     Return,
     Or,
     And,
+    Not,
 
     BadToken,
     Eof
