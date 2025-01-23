@@ -704,3 +704,17 @@ else if (Match(TokenType.Else)) {
     alternate = new IfStatement(null, elseBody, null);
 }
 ```
+
+Now that we have completed the if statement parsing, we add a new option in the `ParseStatement` that directs the parser to parse the if statement.
+
+```
+TokenType.If => ParseIfStatement(),
+```
+
+The next control flow construct we are going to incorporate is the `while` loop. A while loop is much simpler than an if statement as it consists of just a condition and a list of statements.
+
+The expression for it is as follows
+
+```
+
+```

@@ -1,0 +1,7 @@
+if true then
+    let x = 10;
+    
+    if false or true then 
+        let x = 10;
+    endif
+endif
