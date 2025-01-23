@@ -159,12 +159,19 @@ public class Parser {
         if (Match(TokenType.Then)) {
             Current++;
             var trueBranch = ParseExpression();
+            if (HasError) {
+                return ExpressionError("expected expression in ternary operator");
+            }
 
             if (!Expect(TokenType.Else, "'else' after ternary condition")) {
                 return ExpressionError();
             }
 
             var falseBranch = ParseExpression();
+            if (HasError) {
+                return ExpressionError("expected expression in ternary operator");
+            }
+            
             return new TernaryExpression(condition, trueBranch, falseBranch);
         }
 

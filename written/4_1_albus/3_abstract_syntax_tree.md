@@ -1006,4 +1006,27 @@ let x = true then 1
 
 ```
 
-As you can see, the ternary expression is quite powerful and can change the way your code reads, for better or worse.
+Here, the nested ternary expressions demonstrate the flexibility and expressive power of this construct. However, as this example shows, the readability of such code can suffer when ternary expressions are deeply nested.
+
+We are also going to add a check after each `ParseExpression` to ensure that the errors are properly handled. We will revisit the error handling and debugging mechanisms in a later chapter. For now, we are simply displaying a short, informative message.
+
+```
+// ...
+
+var trueBranch = ParseExpression();
+if (HasError) {
+    return ExpressionError("expected expression in ternary operator");
+}
+
+// ...
+```
+
+We are now going to move onto parsing functions in our language.
+
+Functions in Albus are defined as such:
+
+```
+def double(n)
+    return n * 2
+end
+```
