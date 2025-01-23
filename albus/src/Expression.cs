@@ -101,12 +101,12 @@ public class BreakStatement : Expression {
     }
 }
 
-public class ContinueStatement : Expression {
-    public ContinueStatement() {
+public class NextStatement : Expression {
+    public NextStatement() {
         
     }
 
     public override string ToString() {
-        return "continue";
+        return "next";
     }
 }

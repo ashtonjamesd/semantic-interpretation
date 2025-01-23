@@ -26,7 +26,7 @@ public sealed class Lexer(string source, bool debug) {
         ["else"] = TokenType.Else,
         ["end"] = TokenType.End,
         ["break"] = TokenType.Break,
-        ["continue"] = TokenType.Continue,
+        ["next"] = TokenType.Next,
     };
 
     private static readonly Dictionary<char, TokenType> SingleTokens = new() {

@@ -40,7 +40,7 @@ public enum TokenType {
     Endif,
     End,
     Break,
-    Continue,
+    Next,
     Return,
     Or,
     And,

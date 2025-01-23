@@ -31,7 +31,7 @@ public class Parser {
             TokenType.If => ParseIfStatement(),
             TokenType.While => ParseWhileStatement(),
             TokenType.Break => ParseBreakStatement(),
-            TokenType.Continue => ParseContinueStatement(),
+            TokenType.Next => ParseNextStatement(),
             _ => ParseExpression()
         };
     }
@@ -142,15 +142,15 @@ public class Parser {
         return new BreakStatement();
     }
 
-    private Expression ParseContinueStatement() {
+    private Expression ParseNextStatement() {
         Current++;
 
-        if (!Expect(TokenType.SemiColon, "';' after 'continue'")) {
+        if (!Expect(TokenType.SemiColon, "';' after 'next'")) {
             return ExpressionError();
         }
 
         Current--;
-        return new ContinueStatement();
+        return new NextStatement();
     }
 
     private Expression ParseLogicalOr() {

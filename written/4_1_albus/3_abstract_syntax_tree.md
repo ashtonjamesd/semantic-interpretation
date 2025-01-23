@@ -713,8 +713,127 @@ TokenType.If => ParseIfStatement(),
 
 The next control flow construct we are going to incorporate is the `while` loop. A while loop is much simpler than an if statement as it consists of just a condition and a list of statements.
 
-The expression for it is as follows
+The expression class for a `while` statement is as follows:
+
+```
+public class WhileStatement : Expression {
+    public readonly Expression Condition;
+    public readonly List<Expression> Body;
+
+    public WhileStatement(Expression condition, List<Expression> body) {
+        Condition = condition;
+        Body = body;
+    }
+
+    public override string ToString() {
+        string bodyStr = string.Join("\n", Body.Select(b => "  " + b.ToString()));
+
+        return $"while {Condition} \n{bodyStr} \nend";
+    }
+}
+```
+
+We define two properties: one to represent the condition of the while loop, and one to represent the list of statements inside it.
+
+The implementation for a while loop is much simpler than the if statement as there are no alternate or special types of branches.
+
+```
+private Expression ParseWhileStatement() {
+        Current++;
+
+        var condition = ParseExpression();
+        if (HasError) {
+            return ExpressionError("invalid condition in while statement");
+        }
+
+        List<Expression> body = [];
+        while (!IsLastToken() && !Match(TokenType.End)) {
+            var statement = ParseStatement();
+            body.Add(statement);
+
+            Current++;
+        }
+
+        return new WhileStatement(condition, body);
+    }
+```
+
+Once again, we advance past the `While` token to begin with. Then we parse the conditional expression and check for any errors during parsing. Next, we loop until we encounter an `End` token. This is because everything inside the while loop up until the `End` token will be considered part of the body.
+
+Finally, we add an additional case in the top parsing method.
+
+```
+TokenType.While => ParseWhileStatement(),
+```
+
+Now that we have implemented the parsing for while loops, it is probably a good time to introduce the `Next` and `Break` keywords.
+
+The `Next` keyword will allow us to terminate the current iteration of a loop and skip directly to the next one. It behaves exactly like the continue statement in the C programming language, making it useful when certain conditions within the loop should be bypassed without ending the loop entirely.
+
+The model for the Next keyword is extremely simple and does not actually require any fields. The entire class serves as a semantic marker or placeholder, signifying the behavior of skipping the rest of the current iteration.
+
+```
+public class NextStatement : Expression {
+    public NextStatement() {
+        
+    }
+
+    public override string ToString() {
+        return "next";
+    }
+}
+```
+
+As you can probably imagine, he method for parsing a next statement is very basic. We implement it with the following code.
+
+```
+private Expression ParseNextStatement() {
+    Current++;
+
+    if (!Expect(TokenType.SemiColon, "';' after 'next'")) {
+        return ExpressionError();
+    }
+
+    Current--;
+    return new NextStatement();
+}
+```
+
+We advance past the `Next` token. We then enforce the semicolon syntax for ending a statement. We also have to decrement the pointer afterwards as it will be advanced when this method returns to the main loop.
+
+The `Break` keyword terminate the execution of the current loop. The model for the break statement is for the most part identical to the `Next` statement model.
+
+```
+public class BreakStatement : Expression {
+    public BreakStatement() {
+
+    }
+
+    public override string ToString() {
+        return "break";
+    }
+}
+```
+
+We parse the break statement in the same way as the next statement.
+
+```
+private Expression ParseBreakStatement() {
+    Current++;
+
+    if (!Expect(TokenType.SemiColon, "';' after 'break'")) {
+        return ExpressionError();
+    }
+
+    Current--;
+    return new BreakStatement();
+}
 
 ```
 
-```
+
+
+
+TODO!
+  - Unary operator parsing
+  
