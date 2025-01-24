@@ -80,7 +80,22 @@ public class FunctionDeclaration: Expression {
     }
 
     public override string ToString() {
-        return $"def {Identifier} ({Parameters}): {ReturnType}\n{Body}";
+        var parameters = string.Join(",", Parameters.Select(x => x.Identifier));
+        string bodyStr = string.Join("\n", Body.Select(b => "  " + b.ToString()));
+
+        return $"def {Identifier} ({parameters}): {ReturnType.Lexeme}\n{bodyStr}";
+    }
+}
+
+public class ReturnStatement : Expression {
+    public readonly Expression Value;
+
+    public ReturnStatement(Expression value) {
+        Value = value;
+    }
+
+    public override string ToString() {
+        return $"{Value}";
     }
 }
 

@@ -1,3 +1,4 @@
+using System.Data;
 using albus.src;
 
 public class Parser {
@@ -27,17 +28,78 @@ public class Parser {
 
     private Expression ParseStatement() {
         return Tokens[Current].Type switch {
-            TokenType.Let   => ParseVariableDeclaration(),
-            TokenType.If    => ParseIfStatement(),
-            TokenType.While => ParseWhileStatement(),
-            TokenType.Break => ParseBreakStatement(),
-            TokenType.Next  => ParseNextStatement(),
-            _               => ParseExpression()
+            TokenType.Let      => ParseVariableDeclaration(),
+            TokenType.If       => ParseIfStatement(),
+            TokenType.Def      => ParseFunctionDeclaration(),
+            TokenType.While    => ParseWhileStatement(),
+            TokenType.Break    => ParseBreakStatement(),
+            TokenType.Next     => ParseNextStatement(),
+            _                  => ParseExpression()
         };
     }
 
     private Expression ParseExpression() {
         return ParseTernary();
+    }
+
+
+    private Expression ParseFunctionDeclaration() {
+        Current++;
+
+        var identifier = Tokens[Current].Lexeme;
+        if (!Expect(TokenType.Identifier, "identifier after 'let'")) {
+            return ExpressionError();
+        }
+        
+        if (!Expect(TokenType.LeftParen, "'(' after function name")) {
+            return ExpressionError();
+        }
+
+        List<FunctionParameter> parameters = [];
+        while (!IsLastToken() && !Match(TokenType.RightParen)) {
+            var name = Tokens[Current++];
+
+            if (IsLastToken()) {
+                return ExpressionError("invalid function signature");
+            }
+
+            if (!Expect(TokenType.Colon, "':' after parameter")) {
+                return ExpressionError();
+            }
+
+            var type = Tokens[Current++];
+            parameters.Add(new(name.Lexeme, type));
+
+            if (!Match(TokenType.RightParen) && !Expect(TokenType.Comma, "',' after parameter")) {
+                return ExpressionError();
+            }
+
+            if (Match(TokenType.RightParen)) break;
+        }
+
+        Current++;
+        if (!Expect(TokenType.Colon, "':' to specify function return type")) {
+            return ExpressionError();
+        }
+
+        var returnType = Tokens[Current++];
+
+        var statements = new List<Expression>();
+        while (!IsLastToken() && !Match(TokenType.End)) {
+            var statement = ParseStatement();
+            statements.Add(statement);
+
+            Current++;
+        }
+
+        Current--;
+        if (IsLastToken()) {
+            return ExpressionError("function declaration started but missing 'End'");
+        }
+
+        Current++;
+
+        return new FunctionDeclaration(identifier, parameters, returnType, statements);
     }
 
     private Expression ParseVariableDeclaration() {
@@ -171,7 +233,7 @@ public class Parser {
             if (HasError) {
                 return ExpressionError("expected expression in ternary operator");
             }
-            
+
             return new TernaryExpression(condition, trueBranch, falseBranch);
         }
 

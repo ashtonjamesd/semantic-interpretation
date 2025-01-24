@@ -10,7 +10,6 @@ public sealed class Lexer(string source, bool debug) {
     private readonly List<Token> Tokens = [];
 
     private static readonly Dictionary<string, TokenType> Keywords = new() {
-        ["mut"] = TokenType.Mut,
         ["let"] = TokenType.Let,
         ["while"] = TokenType.While,
         ["if"] = TokenType.If,
@@ -28,6 +27,7 @@ public sealed class Lexer(string source, bool debug) {
         ["break"] = TokenType.Break,
         ["next"] = TokenType.Next,
         ["not"] = TokenType.Not,
+        ["def"] = TokenType.Def,
     };
 
     private static readonly Dictionary<char, TokenType> SingleTokens = new() {

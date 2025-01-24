@@ -31,8 +31,8 @@ public enum TokenType {
 
     Identifier,
     Let,
-    Mut,
     While,
+    Def,
     If,
     Elseif,
     Else,

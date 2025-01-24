@@ -1086,3 +1086,11 @@ public class FunctionParameter : Expression
     }
 }
 ```
+
+Since all function definitions start with the `Def` keyword, we can simply look for this occurrence and then continue to parse the rest of the function.
+
+Add the `Def` token to the lexer vocabulary if you haven't already.
+
+```
+TokenType.Def   => ParseFunctionDeclaration(),
+```
