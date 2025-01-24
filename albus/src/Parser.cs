@@ -31,6 +31,7 @@ public class Parser {
             TokenType.Let      => ParseVariableDeclaration(),
             TokenType.If       => ParseIfStatement(),
             TokenType.Def      => ParseFunctionDeclaration(),
+            TokenType.Return   => ParseReturnStatement(), 
             TokenType.While    => ParseWhileStatement(),
             TokenType.Break    => ParseBreakStatement(),
             TokenType.Next     => ParseNextStatement(),
@@ -42,12 +43,28 @@ public class Parser {
         return ParseTernary();
     }
 
+    private Expression ParseReturnStatement() {
+        Current++;
+
+
+        var expression = ParseExpression();
+        if (HasError) {
+            return ExpressionError("expected expression in return statement");
+        }
+
+        if (!Expect(TokenType.SemiColon, "';' after return statement")) {
+            return ExpressionError();
+        }
+
+        Current--;
+        return new ReturnStatement(expression);
+    }
 
     private Expression ParseFunctionDeclaration() {
         Current++;
 
         var identifier = Tokens[Current].Lexeme;
-        if (!Expect(TokenType.Identifier, "identifier after 'let'")) {
+        if (!Expect(TokenType.Identifier, "function name after 'def'")) {
             return ExpressionError();
         }
         

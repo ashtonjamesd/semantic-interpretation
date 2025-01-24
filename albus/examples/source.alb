@@ -1,3 +1,4 @@
-def x(): int
+def test(): int 
     let x = 10;
+    return 2;
 end

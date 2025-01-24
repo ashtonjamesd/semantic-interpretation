@@ -95,7 +95,7 @@ public class ReturnStatement : Expression {
     }
 
     public override string ToString() {
-        return $"{Value}";
+        return $"return {Value}";
     }
 }
 
