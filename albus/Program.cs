@@ -42,7 +42,7 @@ internal class Program {
             Console.WriteLine($"Expr: {expr}");
         }
 
-        var validator = new SemanticAnalyser(ast);
+        var validator = new SemanticAnalyzer(ast);
         foreach (var expr in ast.Body) {
             expr.Accept(validator);
         }

@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 namespace albus.src;
 
 public abstract class Expression { 
-    public abstract void Accept(SemanticAnalyser analyser);
+    public abstract void Accept(SemanticAnalyzer analyzer);
 }
 
 public class Ast {
@@ -11,10 +11,10 @@ public class Ast {
 }
 
 public class BadExpression : Expression {
-    public override void Accept(SemanticAnalyser analyser) { }
+    public override void Accept(SemanticAnalyzer analyzer) { }
 }
 public class EofExpression : Expression { 
-    public override void Accept(SemanticAnalyser analyser) { }
+    public override void Accept(SemanticAnalyzer analyzer) { }
 }
 
 public class LiteralExpression : Expression {
@@ -28,8 +28,8 @@ public class LiteralExpression : Expression {
         return Value.ToString() ?? "null";
     }
 
-    public override void Accept(SemanticAnalyser analyser) {
-    
+    public override void Accept(SemanticAnalyzer analyzer) {
+        analyzer.Visit(this);
     }
 }
 
@@ -48,8 +48,8 @@ public class VariableDeclaration : Expression {
         return $"{Identifier}: {Type?.Lexeme} = {Value}";
     }
 
-    public override void Accept(SemanticAnalyser analyser) {
-        analyser.Visit(this);
+    public override void Accept(SemanticAnalyzer analyzer) {
+        analyzer.Visit(this);
     }
 }
 
@@ -68,7 +68,7 @@ public class BinaryExpression : Expression {
         return $"({Left} {Operator.Lexeme} {Right})";
     }
 
-    public override void Accept(SemanticAnalyser analyser) {
+    public override void Accept(SemanticAnalyzer analyzer) {
         
     }
 }
@@ -86,7 +86,7 @@ public class UnaryExpression : Expression {
         return $"({Operator.Lexeme} {Left})";
     }
 
-    public override void Accept(SemanticAnalyser analyser) {
+    public override void Accept(SemanticAnalyzer analyzer) {
         
     }
 }
@@ -111,7 +111,7 @@ public class FunctionDeclaration: Expression {
         return $"def {Identifier} ({parameters}): {ReturnType.Lexeme}\n{bodyStr}";
     }
 
-    public override void Accept(SemanticAnalyser analyser) {
+    public override void Accept(SemanticAnalyzer analyzer) {
         
     }
 }
@@ -127,7 +127,7 @@ public class ReturnStatement : Expression {
         return $"return {Value}";
     }
 
-    public override void Accept(SemanticAnalyser analyser) {
+    public override void Accept(SemanticAnalyzer analyzer) {
         
     }
 }
@@ -147,7 +147,7 @@ public class FunctionParameter : Expression
         return $"{Identifier}: {Type},";
     }
 
-    public override void Accept(SemanticAnalyser analyser) {
+    public override void Accept(SemanticAnalyzer analyzer) {
         
     }
 }
@@ -167,7 +167,7 @@ public class TernaryExpression : Expression {
         return $"{Condition} then {TrueBranch} else {FalseBranch}";
     }
 
-    public override void Accept(SemanticAnalyser analyser) {
+    public override void Accept(SemanticAnalyzer analyzer) {
         
     }
 }
@@ -194,7 +194,7 @@ public class IfStatement : Expression {
         return $"{ifWord} {Condition} then \n{bodyStr} \n{Alternate}  endif";
     }
 
-    public override void Accept(SemanticAnalyser analyser) {
+    public override void Accept(SemanticAnalyzer analyzer) {
         
     }
 }
@@ -214,7 +214,7 @@ public class WhileStatement : Expression {
         return $"while {Condition} \n{bodyStr} \nend";
     }
 
-    public override void Accept(SemanticAnalyser analyser) {
+    public override void Accept(SemanticAnalyzer analyzer) {
         
     }
 }
@@ -228,7 +228,7 @@ public class BreakStatement : Expression {
         return "break";
     }
 
-    public override void Accept(SemanticAnalyser analyser) {
+    public override void Accept(SemanticAnalyzer analyzer) {
         
     }
 }
@@ -242,7 +242,7 @@ public class NextStatement : Expression {
         return "next";
     }
 
-    public override void Accept(SemanticAnalyser analyser) {
+    public override void Accept(SemanticAnalyzer analyzer) {
         
     }
 }

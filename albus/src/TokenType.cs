@@ -28,7 +28,10 @@ public enum TokenType {
     Void,
     True,
     False,
-
+    IntType,
+    StringType,
+    CharType,
+    FloatType,
     Identifier,
     Let,
     While,

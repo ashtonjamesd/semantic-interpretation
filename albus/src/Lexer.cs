@@ -28,6 +28,10 @@ public sealed class Lexer(string source, bool debug) {
         ["next"] = TokenType.Next,
         ["not"] = TokenType.Not,
         ["def"] = TokenType.Def,
+        ["int"] = TokenType.IntType,
+        ["string"] = TokenType.StringType,
+        ["float"] = TokenType.FloatType,
+        ["char"] = TokenType.CharType,
     };
 
     private static readonly Dictionary<char, TokenType> SingleTokens = new() {
