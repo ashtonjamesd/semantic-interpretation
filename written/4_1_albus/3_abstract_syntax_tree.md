@@ -1210,3 +1210,61 @@ Current++;
 return new FunctionDeclaration(identifier, parameters, returnType, statements);
 ```
 
+To enable the parser to be able to return information, we need to incorporate the `Return` statement. This is a very simple expression as it is simply the word 'return' followed by some expression.
+
+The model for this is as follows.
+
+```
+public class ReturnStatement : Expression {
+    public readonly Expression Value;
+
+    public ReturnStatement(Expression value) {
+        Value = value;
+    }
+
+    public override string ToString() {
+        return $"return {Value}";
+    }
+}
+```
+
+The implementation for the return statement is also very simple. We advance past the return keyword, then parse the following expression. Finally, we expect a semicolon at the end of the statement and return a new return expression.
+
+```
+private Expression ParseReturnStatement() {
+    Current++;
+
+    var expression = ParseExpression();
+    if (HasError) {
+        return ExpressionError("expected expression in return statement");
+    }
+
+    if (!Expect(TokenType.SemiColon, "';' after return statement")) {
+        return ExpressionError();
+    }
+
+    Current--;
+    return new ReturnStatement(expression);
+}
+```
+
+Additionally, we add the following in `ParseStatement`.
+
+```
+TokenType.Return   => ParseReturnStatement(), 
+```
+
+<br/>
+
+Currently, the parser supports the following major types of statements and expressions:
+
+```
+- Variable Declarations
+- Function Declarations
+- Binary and Unary Expressions
+- If Statements
+- While Loops
+- Ternary Operations
+```
+
+At this point, our language has a sufficient range of expressions to allow us to proceed to the next phase of the interpreter: semantic analysis.

@@ -16,10 +16,12 @@ internal class Program {
 
         bool isDebug = false;
         if (args.Length == 2) {
-            if (args[1] is "-d") isDebug = true;
-            else {
+            if (args[1] is not ("-d")) {
                 Console.WriteLine($"invalid flag '{args[1]}'");
+                return;
             }
+
+            isDebug = true;
         }
 
         var source = File.ReadAllText(args[0]);
@@ -39,5 +41,12 @@ internal class Program {
         foreach (var expr in ast.Body) {
             Console.WriteLine($"Expr: {expr}");
         }
+
+        var validator = new SemanticAnalyser(ast);
+        foreach (var expr in ast.Body) {
+            expr.Accept(validator);
+        }
+
+        Console.WriteLine("execution finished.");
     }
 }

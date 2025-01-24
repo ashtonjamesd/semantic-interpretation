@@ -46,7 +46,6 @@ public class Parser {
     private Expression ParseReturnStatement() {
         Current++;
 
-
         var expression = ParseExpression();
         if (HasError) {
             return ExpressionError("expected expression in return statement");
