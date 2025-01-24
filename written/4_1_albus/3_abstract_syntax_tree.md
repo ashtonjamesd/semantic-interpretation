@@ -1094,3 +1094,119 @@ Add the `Def` token to the lexer vocabulary if you haven't already.
 ```
 TokenType.Def   => ParseFunctionDeclaration(),
 ```
+
+Again, we start by advancing past the initial keyword for this statement.
+
+```
+private Expression ParseFunctionDeclaration() {
+    Current++;
+
+    // ...
+}
+```
+
+Next, we parse the name of the function.
+
+```
+var identifier = Tokens[Current].Lexeme;
+if (!Expect(TokenType.Identifier, "function name after 'def'")) {
+    return ExpressionError();
+}
+```
+
+The next part of our function signature is the list of parameters the function takes in. To begin with, we expect an open parenthesis character.
+
+```
+if (!Expect(TokenType.LeftParen, "'(' after function name")) {
+    return ExpressionError();
+}
+```
+
+We define a list to hold the parameters that we are going to parse from this function. Then, we start a while loop that will keep looking for more parameters until it encounters a right parenthesis character. 
+
+```
+List<FunctionParameter> parameters = [];
+while (!IsLastToken() && !Match(TokenType.RightParen)) {
+    // ...
+}
+```
+
+Next, we first expect to find the name of the parameter. We capture this inside a variable while also advancing the current pointer.
+
+```
+var name = Tokens[Current++];
+
+if (IsLastToken()) {
+    return ExpressionError("invalid function signature");
+}
+```
+
+Since we are incrementing the current pointer, we have to check if we are currently at the last token to prevent any out-of-bounds errors.
+
+The next token expected for a function parameter is a colon character which is then followed by the type of the parameter. Once we have the name and type of the parameter, we add it to the list of expressions we defined earlier.
+
+```
+if (!Expect(TokenType.Colon, "':' after parameter")) {
+    return ExpressionError();
+}
+
+var type = Tokens[Current++];
+// we don't check out of range here as the next snippet does this in `Match` and `Expect`
+
+parameters.Add(new(name.Lexeme, type));
+```
+
+To account for multiple parameters in the function signature, we expect a comma after each type. We also check that the current token is not a right parenthesis as there would be no comma required in a function that takes a singular parameter.
+
+At this point, the parameter list could either end with a right parenthesis or continue with a comma, which is why suggest the two tokens in the error message.
+
+```
+if (!Match(TokenType.RightParen) && !Expect(TokenType.Comma, "',' or ')' after parameter")) {
+    return ExpressionError();
+}
+```
+
+The last part of the function signature is the return type. This is simply a colon character followed by a type. We first advance past the right parenthesis from the parameter list.
+
+Similarly to a parameter, we expect a colon and then capture the return type token. We also perform another check to ensure we do not access a token beyond bounds.
+
+```
+Current++;
+if (!Expect(TokenType.Colon, "':' to specify function return type")) {
+    return ExpressionError();
+}
+
+if (IsLastToken()) {
+    return ExpressionError("expected function return type in signature");
+}
+var returnType = Tokens[Current++];
+```
+
+The last part of our function expression is the actual body of statements itself.
+
+We define a list to hold our statements. Then we continue to loop while the parser does not encounter an `End` token. It will consider everything up until then as part of the function body.
+
+```
+var statements = new List<Expression>();
+while (!IsLastToken() && !Match(TokenType.End)) {
+    var statement = ParseStatement();
+    statements.Add(statement);
+
+    Current++;
+}
+```
+
+If the parser reaches the end of the token list without encountering an End token for the function, an error is reported.
+
+Finally, we return a new function declaration expression containing the components that we have parsed from the signature and the body.
+
+```
+if (IsLastToken()) {
+    return ExpressionError("function declaration started but missing 'End'");
+}
+
+Current++;
+
+return new FunctionDeclaration(identifier, parameters, returnType, statements);
+```
+

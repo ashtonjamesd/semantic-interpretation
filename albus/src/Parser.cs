@@ -87,11 +87,9 @@ public class Parser {
             var type = Tokens[Current++];
             parameters.Add(new(name.Lexeme, type));
 
-            if (!Match(TokenType.RightParen) && !Expect(TokenType.Comma, "',' after parameter")) {
+            if (!Match(TokenType.RightParen) && !Expect(TokenType.Comma, "',' or ')' after parameter")) {
                 return ExpressionError();
             }
-
-            if (Match(TokenType.RightParen)) break;
         }
 
         Current++;
@@ -99,6 +97,9 @@ public class Parser {
             return ExpressionError();
         }
 
+        if (IsLastToken()) {
+            return ExpressionError("expected function return type in signature");
+        }
         var returnType = Tokens[Current++];
 
         var statements = new List<Expression>();
@@ -109,7 +110,6 @@ public class Parser {
             Current++;
         }
 
-        Current--;
         if (IsLastToken()) {
             return ExpressionError("function declaration started but missing 'End'");
         }
@@ -391,6 +391,6 @@ public class Parser {
     }
 
     private bool IsLastToken() {
-        return Current >= Tokens.Count;
+        return Current >= Tokens.Count || Tokens[Current].Type is TokenType.Eof;
     }
 }

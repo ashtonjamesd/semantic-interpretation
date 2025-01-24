@@ -1,4 +1,1 @@
-def test(): int 
-    let x = 10;
-    return 2;
-end
+def test(i: a, i: a
