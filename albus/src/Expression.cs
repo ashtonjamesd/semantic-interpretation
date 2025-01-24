@@ -36,14 +36,16 @@ public class LiteralExpression : Expression {
 public class VariableDeclaration : Expression {
     public readonly string Identifier;
     public readonly Expression Value;
+    public readonly Token? Type;
 
-    public VariableDeclaration(string identifier, Expression value) {
+    public VariableDeclaration(string identifier, Expression value, Token? type) {
         Identifier = identifier;
         Value = value;
+        Type = type;
     }
 
     public override string ToString() {
-        return $"{Identifier} = {Value}";
+        return $"{Identifier}: {Type?.Lexeme} = {Value}";
     }
 
     public override void Accept(SemanticAnalyser analyser) {

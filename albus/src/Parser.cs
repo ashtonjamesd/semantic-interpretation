@@ -28,14 +28,14 @@ public class Parser {
 
     private Expression ParseStatement() {
         return Tokens[Current].Type switch {
-            TokenType.Let      => ParseVariableDeclaration(),
-            TokenType.If       => ParseIfStatement(),
-            TokenType.Def      => ParseFunctionDeclaration(),
-            TokenType.Return   => ParseReturnStatement(), 
-            TokenType.While    => ParseWhileStatement(),
-            TokenType.Break    => ParseBreakStatement(),
-            TokenType.Next     => ParseNextStatement(),
-            _                  => ParseExpression()
+            TokenType.Let    => ParseVariableDeclaration(),
+            TokenType.If     => ParseIfStatement(),
+            TokenType.Def    => ParseFunctionDeclaration(),
+            TokenType.Return => ParseReturnStatement(), 
+            TokenType.While  => ParseWhileStatement(),
+            TokenType.Break  => ParseBreakStatement(),
+            TokenType.Next   => ParseNextStatement(),
+            _                => ParseExpression()
         };
     }
 
@@ -126,6 +126,12 @@ public class Parser {
             return ExpressionError();
         }
 
+        Token? type = null;
+        if (Match(TokenType.Colon)) {
+            Current++;
+            type = Tokens[Current++];
+        }
+
         if (!Expect(TokenType.SingleEquals, "'=' after identifier")) {
             return ExpressionError();
         }
@@ -140,7 +146,7 @@ public class Parser {
         }
 
         Current--;
-        return new VariableDeclaration(identifier, value);
+        return new VariableDeclaration(identifier, value, type);
     }
 
     private Expression ParseIfStatement() {
