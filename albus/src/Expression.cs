@@ -66,6 +66,40 @@ public class UnaryExpression : Expression {
     }
 }
 
+public class FunctionDeclaration: Expression {
+    public readonly string Identifier;
+    public readonly List<FunctionParameter> Parameters;
+    public readonly Token ReturnType;
+    public readonly List<Expression> Body;
+
+    public FunctionDeclaration(string identifier, List<FunctionParameter> parameters, Token returnType, List<Expression> body) {
+        Identifier = identifier;
+        Parameters = parameters;
+        ReturnType = returnType;
+        Body = body;
+    }
+
+    public override string ToString() {
+        return $"def {Identifier} ({Parameters}): {ReturnType}\n{Body}";
+    }
+}
+
+public class FunctionParameter : Expression
+{
+    public readonly string Identifier;
+    public readonly Token Type;
+
+    public FunctionParameter(string identifier, Token type)
+    {
+        Identifier = identifier;
+        Type = type;
+    }
+
+    public override string ToString() {
+        return $"{Identifier}: {Type},";
+    }
+}
+
 public class TernaryExpression : Expression {
     public readonly Expression Condition;
     public readonly Expression TrueBranch;

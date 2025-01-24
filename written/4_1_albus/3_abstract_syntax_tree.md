@@ -1021,12 +1021,68 @@ if (HasError) {
 // ...
 ```
 
-We are now going to move onto parsing functions in our language.
-
-Functions in Albus are defined as such:
+Functions are a cornerstone of programming, allowing us to break down problems into smaller, reusable components. In Albus, functions are defined with a clear and concise syntax. Here's an example of a simple function:
 
 ```
-def double(n)
-    return n * 2
+def double(n: int): int
+    return n * 2;
 end
+```
+
+This snippet defines a function `double` that takes in a parameter `n`, and returns the value of `n` multiplied by two.
+
+By now you should be quite comfortable with parsing statements and expressions and have some sort of vision for how this could work. Let's analyze each part of the function declaration.
+
+The `def` keyword marks the start of a function declaration and is purely syntactical. This will be followed by the name of the function and a list of parameters enclosed inside brackets. A parameter starts with a name, followed by a colon, and then the type of the parameter.
+
+The example above only has one parameter being passed in, however if there were multiple parameters passed in to the function, each parameter would be separated by a comma, like this:
+
+```
+// ... (n1: int, n2: int)
+```
+
+Then, the closing parenthesis will be followed by a colon and then the return type of the function, marking the end of our function signature. The rest of the statements after this declaration are all part of the functions body until an `End` token is encountered.
+
+In our function structure, the key components to consider when parsing a declaration are the function name, parameters, return type, and body. These parts (except the body) make up the functions unique signature.
+
+Here is the model for our function declaration based on these components.
+
+```
+public class FunctionDeclaration: Expression {
+    public readonly string Identifier;
+    public readonly List<FunctionParameter> Parameters;
+    public readonly Token ReturnType;
+    public readonly List<Expression> Body;
+
+    public FunctionDeclaration(string identifier, List<FunctionParameter> parameters, Token returnType, List<Expression> body) {
+        Identifier = identifier;
+        Parameters = parameters;
+        ReturnType = returnType;
+        Body = body;
+    }
+
+    public override string ToString() {
+        return $"def {Identifier} ({Parameters}): {ReturnType}\n{Body}";
+    }
+}
+```
+
+We also need a model to represent a function parameter as an object that encapsulates its name and type.
+
+```
+public class FunctionParameter : Expression
+{
+    public readonly string Identifier;
+    public readonly Token Type;
+
+    public FunctionParameter(string identifier, Token type)
+    {
+        Identifier = identifier;
+        Type = type;
+    }
+
+    public override string ToString() {
+        return $"{Identifier}: {Type},";
+    }
+}
 ```
