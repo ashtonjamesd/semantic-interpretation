@@ -43,9 +43,7 @@ internal class Program {
         }
 
         var validator = new SemanticAnalyzer(ast);
-        foreach (var expr in ast.Body) {
-            expr.Accept(validator);
-        }
+        validator.Analyze();
 
         Console.WriteLine("execution finished.");
     }
