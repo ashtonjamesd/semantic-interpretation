@@ -1254,6 +1254,58 @@ Additionally, we add the following in `ParseStatement`.
 TokenType.Return   => ParseReturnStatement(), 
 ```
 
+There is actually one more expression type that we need to implement before we move onto the next part of the interpreter, and that is the assignment expression.
+
+The assignment expression operates on an existing variable and changes its value to a given expression.
+
+```
+x = 10;
+```
+
+The model for the assignment expression will contain the variable identifier and the expression value that it is being reassigned to.
+
+```
+public class AssignmentExpression : Expression {
+    public readonly string Identifier;
+    public readonly Expression Value;
+    
+    public AssignmentExpression(string identifier, Expression value) {
+        Identifier = identifier;
+        Value = value;
+    }
+
+    public override string ToString() {
+        return $"{Identifier} = {Value}";
+    }
+}
+```
+
+Now, lets provide the implementation.
+
+```
+private Expression ParseAssignmentStatement() {
+    var identifier = Tokens[Current++];
+
+    if (!Expect(TokenType.SingleEquals, "'=' in assignment expression")) {
+        return ExpressionError();
+    }
+
+    var value = ParseExpression();
+    if (HasError) {
+        return ExpressionError("expected expression in assignment expression");
+    }
+
+    if (!Expect(TokenType.SemiColon, "';' after statement")) {
+        return ExpressionError();
+    }
+
+    return new AssignmentExpression(identifier.Lexeme, value);
+}
+```
+
+We start by retrieving the identifier token, then enforcing the equals syntax, and then parsing the actual expression itself. Finally, we return a new instance of an assignment expression.
+
+
 <br/>
 
 Currently, the parser supports the following major types of statements and expressions:

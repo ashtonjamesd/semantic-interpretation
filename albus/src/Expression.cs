@@ -73,7 +73,21 @@ public class UnaryExpression : Expression {
     }
 }
 
-public class FunctionDeclaration: Expression {
+public class AssignmentExpression : Expression {
+    public readonly string Identifier;
+    public readonly Expression Value;
+    
+    public AssignmentExpression(string identifier, Expression value) {
+        Identifier = identifier;
+        Value = value;
+    }
+
+    public override string ToString() {
+        return $"{Identifier} = {Value}";
+    }
+}
+
+public class FunctionDeclaration : Expression {
     public readonly string Identifier;
     public readonly List<FunctionParameter> Parameters;
     public readonly Token ReturnType;

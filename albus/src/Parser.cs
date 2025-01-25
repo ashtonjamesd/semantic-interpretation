@@ -28,19 +28,39 @@ public class Parser {
 
     private Expression ParseStatement() {
         return Tokens[Current].Type switch {
-            TokenType.Let    => ParseVariableDeclaration(),
-            TokenType.If     => ParseIfStatement(),
-            TokenType.Def    => ParseFunctionDeclaration(),
+            TokenType.Let => ParseVariableDeclaration(),
+            TokenType.If => ParseIfStatement(),
+            TokenType.Def => ParseFunctionDeclaration(),
             TokenType.Return => ParseReturnStatement(), 
-            TokenType.While  => ParseWhileStatement(),
-            TokenType.Break  => ParseBreakStatement(),
-            TokenType.Next   => ParseNextStatement(),
-            _                => ParseExpression()
+            TokenType.While => ParseWhileStatement(),
+            TokenType.Break => ParseBreakStatement(),
+            TokenType.Next => ParseNextStatement(),
+            TokenType.Identifier => ParseAssignmentStatement(),
+            _ => ParseExpression()
         };
     }
 
     private Expression ParseExpression() {
         return ParseTernary();
+    }
+
+    private Expression ParseAssignmentStatement() {
+        var identifier = Tokens[Current++];
+
+        if (!Expect(TokenType.SingleEquals, "'=' in assignment expression")) {
+            return ExpressionError();
+        }
+
+        var value = ParseExpression();
+        if (HasError) {
+            return ExpressionError("expected expression in assignment expression");
+        }
+
+        if (!Expect(TokenType.SemiColon, "';' after statement")) {
+            return ExpressionError();
+        }
+
+        return new AssignmentExpression(identifier.Lexeme, value);
     }
 
     private Expression ParseReturnStatement() {
