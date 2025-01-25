@@ -21,6 +21,7 @@ public class SemanticAnalyzer {
             BinaryExpression binary => EvaluateBinaryExpression(binary),
             LiteralExpression literal => EvaluateLiteralExpression(literal),
             VariableDeclaration variableDeclaration => EvaluateVariableDeclaration(variableDeclaration),
+            AssignmentExpression assignment => EvaluateAssignment(assignment),
             _ => null
         };
 
@@ -43,10 +44,23 @@ public class SemanticAnalyzer {
     private object EvaluateVariableDeclaration(VariableDeclaration declaration) {
         if (SymbolTable.Peek().ContainsKey(declaration.Identifier)) {
             Console.WriteLine($"variable '{declaration.Identifier}' already defined in this scope.");
+            return null;
         }
 
         var value = EvaluateExpression(declaration.Value);
         SymbolTable.Peek()[declaration.Identifier] = value;
+
+        return value;
+    }
+
+    private object EvaluateAssignment(AssignmentExpression assignment) {
+        if (!SymbolTable.Peek().TryGetValue(assignment.Identifier, out _)) {
+            Console.WriteLine($"variable '{assignment.Identifier}' not defined in this scope");
+            return null;
+        }
+
+        var value = EvaluateExpression(assignment.Value);
+        SymbolTable.Peek()[assignment.Identifier] = value;
 
         return value;
     }

@@ -13,22 +13,5 @@ However, the types are not compatible, as you cannot assign a string value to a 
 The semantic analysis stage ensures that cases like this are raised before the interpreter begins traversing and executing the AST. 
 
 ```
-private Expression ParseAssignmentStatement() {
-    var identifier = Tokens[Current++];
 
-    if (!Expect(TokenType.SingleEquals, "'=' in assignment expression")) {
-        return ExpressionError();
-    }
-
-    var value = ParseExpression();
-    if (HasError) {
-        return ExpressionError("expected expression in assignment expression");
-    }
-
-    if (!Expect(TokenType.SemiColon, "';' after statement")) {
-        return ExpressionError();
-    }
-
-    return new AssignmentExpression(identifier.Lexeme, value);
-}
 ```
