@@ -73,7 +73,7 @@ public class Resolver {
         }
 
         return binary.Operator.Type switch {
-            TokenType.Plus   => (int)left + (int)right,
+            TokenType.Plus   => (left is string v && right is string v1) ? v + v1 : (int)left + (int)right,
             TokenType.Minus  => (int)left - (int)right,
             TokenType.Star   => (int)left * (int)right,
             TokenType.Slash  => (int)left / (int)right,

@@ -366,7 +366,7 @@ public class Parser {
         var token = Tokens[Current++];
 
         return token.Type switch {
-            TokenType.String => new LiteralExpression(token.Lexeme),
+            TokenType.String => new LiteralExpression(token.Lexeme[1..(token.Lexeme.Length - 1)]),
             TokenType.Integer => new LiteralExpression(int.Parse(token.Lexeme)),
             TokenType.Char => new LiteralExpression(char.Parse(token.Lexeme)),
             TokenType.True or TokenType.False => new LiteralExpression(bool.Parse(token.Lexeme)),
