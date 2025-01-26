@@ -42,7 +42,7 @@ internal class Program {
             Console.WriteLine($"Expr: {expr}");
         }
 
-        var validator = new SemanticAnalyzer(ast);
+        var validator = new Resolver(ast);
         validator.Analyze();
 
         Console.WriteLine("execution finished.");

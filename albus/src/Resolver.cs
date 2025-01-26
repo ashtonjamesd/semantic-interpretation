@@ -1,10 +1,10 @@
-using albus.src;
+namespace albus.src;
 
-public class SemanticAnalyzer {
+public class Resolver {
     private readonly Ast Ast;
     private readonly Stack<Dictionary<string, object>> SymbolTable = new();
 
-    public SemanticAnalyzer(Ast ast) {
+    public Resolver(Ast ast) {
         Ast = ast;
         SymbolTable.Push(new Dictionary<string, object>());
     }
@@ -12,6 +12,7 @@ public class SemanticAnalyzer {
     public void Analyze() {
         foreach (var expr in Ast.Body) {
             var x = EvaluateExpression(expr);
+            Console.WriteLine(x);
         }
     }
 
@@ -28,7 +29,6 @@ public class SemanticAnalyzer {
 
         return result;
     }
-
 
     private object EvaluateIfStatement(IfStatement ifStmt) {
         if (ifStmt.Condition is not null) {
@@ -67,13 +67,32 @@ public class SemanticAnalyzer {
         var left = EvaluateExpression(binary.Left);
         var right = EvaluateExpression(binary.Right);
 
+        var result = CheckTypes(left, right, binary.Operator.Type);
+        if (!result) {
+            return false;
+        }
+
         return binary.Operator.Type switch {
-            TokenType.Plus => (int)left + (int)right,
-            TokenType.Minus => (int)left - (int)right,
-            TokenType.Star => (int)left * (int)right,
-            TokenType.Slash => (int)left / (int)right,
+            TokenType.Plus   => (int)left + (int)right,
+            TokenType.Minus  => (int)left - (int)right,
+            TokenType.Star   => (int)left * (int)right,
+            TokenType.Slash  => (int)left / (int)right,
             TokenType.Modulo => (int)left % (int)right,
         };
+    }
+
+    private bool CheckTypes(object? a, object? b, TokenType op) {
+        if (a is int && b is int) {
+            return true;
+        } else if (a is string && b is string && op == TokenType.Plus) {
+            return true;
+        } else if (a is bool || b is bool) {
+            Console.WriteLine($"Error: Cannot apply operator '{op}' to boolean values.");
+            return false;
+        } else {
+            Console.WriteLine($"Error: Cannot apply operator '{op}' to values of type '{a?.GetType().Name}' and '{b?.GetType().Name}'.");
+            return false;
+        }
     }
 
     private object EvaluateVariableDeclaration(VariableDeclaration declaration) {

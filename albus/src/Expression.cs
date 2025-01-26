@@ -42,16 +42,14 @@ public class IdentifierExpression : Expression {
 public class VariableDeclaration : Expression {
     public readonly string Identifier;
     public readonly Expression Value;
-    public readonly Token? Type;
 
-    public VariableDeclaration(string identifier, Expression value, Token? type) {
+    public VariableDeclaration(string identifier, Expression value) {
         Identifier = identifier;
         Value = value;
-        Type = type;
     }
 
     public override string ToString() {
-        return $"{Identifier}: {Type?.Lexeme} = {Value}";
+        return $"{Identifier} = {Value}";
     }
 }
 

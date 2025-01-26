@@ -147,12 +147,6 @@ public class Parser {
             return ExpressionError();
         }
 
-        Token? type = null;
-        if (Match(TokenType.Colon)) {
-            Current++;
-            type = Tokens[Current++];
-        }
-
         if (!Expect(TokenType.SingleEquals, "'=' after identifier")) {
             return ExpressionError();
         }
@@ -167,7 +161,7 @@ public class Parser {
         }
 
         Current--;
-        return new VariableDeclaration(identifier, value, type);
+        return new VariableDeclaration(identifier, value);
     }
 
     private Expression ParseIfStatement() {
