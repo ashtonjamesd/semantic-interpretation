@@ -1,2 +1,7 @@
 let x = 10;
-x = 10;
+
+if false then
+  x = 1;
+else then
+  x = 2;
+endif

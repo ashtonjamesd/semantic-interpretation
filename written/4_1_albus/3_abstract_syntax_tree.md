@@ -1299,6 +1299,7 @@ private Expression ParseAssignmentStatement() {
         return ExpressionError();
     }
 
+    Current--; // increment offset
     return new AssignmentExpression(identifier.Lexeme, value);
 }
 ```

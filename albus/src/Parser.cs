@@ -60,6 +60,8 @@ public class Parser {
             return ExpressionError();
         }
 
+        Current--;
+
         return new AssignmentExpression(identifier.Lexeme, value);
     }
 
@@ -172,7 +174,7 @@ public class Parser {
     private Expression ParseIfStatement() {
         Current++;
 
-        var condition = ParseExpression();
+        var condition = ParseLogicalOr();
         if (HasError) {
             return ExpressionError("invalid condition in if statement");
         }
@@ -184,6 +186,7 @@ public class Parser {
         var ifBody = new List<Expression>();
         while (!IsLastToken() && CurrentToken().Type is not (TokenType.Endif or TokenType.Elseif or TokenType.Else)) {
             var statement = ParseStatement();
+        Console.WriteLine(statement.GetType());
             Current++;
 
             ifBody.Add(statement);
