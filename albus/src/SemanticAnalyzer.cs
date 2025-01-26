@@ -12,7 +12,6 @@ public class SemanticAnalyzer {
     public void Analyze() {
         foreach (var expr in Ast.Body) {
             var x = EvaluateExpression(expr);
-            Console.WriteLine(x);
         }
     }
 
@@ -22,12 +21,14 @@ public class SemanticAnalyzer {
             LiteralExpression literal => EvaluateLiteralExpression(literal),
             VariableDeclaration variableDeclaration => EvaluateVariableDeclaration(variableDeclaration),
             AssignmentExpression assignment => EvaluateAssignment(assignment),
+            IdentifierExpression identifier => EvaluateIdentifier(identifier),
             IfStatement ifStatement => EvaluateIfStatement(ifStatement),
             _ => null
         };
 
         return result;
     }
+
 
     private object EvaluateIfStatement(IfStatement ifStmt) {
         if (ifStmt.Condition is not null) {
@@ -58,6 +59,7 @@ public class SemanticAnalyzer {
                 return scope;
             }
         }
+
         return null;
     }
 
@@ -93,9 +95,13 @@ public class SemanticAnalyzer {
             return false;
         }
 
+        if (assignment.Value is IdentifierExpression expr) {
+            var variable = ResolveVariable(expr.Name);
+            
+        }
+
         var value = EvaluateExpression(assignment.Value);
         found[assignment.Identifier] = value;
-        Console.WriteLine($"assigning to {value}");
 
         return value;
     }
@@ -111,6 +117,15 @@ public class SemanticAnalyzer {
 
         SymbolTable.Pop();
         return result;
+    }
+
+    private object EvaluateIdentifier(IdentifierExpression identifier) {
+        var found = ResolveVariable(identifier.Name);
+        if (found is null || !found.TryGetValue(identifier.Name, out var value)) {
+            return null;
+        }
+
+        return value;
     }
 
     private object EvaluateLiteralExpression(LiteralExpression literal) {

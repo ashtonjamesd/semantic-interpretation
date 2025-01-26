@@ -27,6 +27,18 @@ public class LiteralExpression : Expression {
     }
 }
 
+public class IdentifierExpression : Expression {
+    public readonly string Name;
+
+    public IdentifierExpression(string name) {
+        Name = name;
+    }
+
+    public override string ToString() {
+        return Name;
+    }
+}
+
 public class VariableDeclaration : Expression {
     public readonly string Identifier;
     public readonly Expression Value;

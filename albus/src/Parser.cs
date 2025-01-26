@@ -61,7 +61,6 @@ public class Parser {
         }
 
         Current--;
-
         return new AssignmentExpression(identifier.Lexeme, value);
     }
 
@@ -377,7 +376,7 @@ public class Parser {
             TokenType.Integer => new LiteralExpression(int.Parse(token.Lexeme)),
             TokenType.Char => new LiteralExpression(char.Parse(token.Lexeme)),
             TokenType.True or TokenType.False => new LiteralExpression(bool.Parse(token.Lexeme)),
-            TokenType.Identifier => new LiteralExpression(token.Lexeme),
+            TokenType.Identifier => new IdentifierExpression(token.Lexeme),
             _ => ExpressionError()
         };
     }

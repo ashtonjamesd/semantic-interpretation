@@ -1,0 +1,10 @@
+let x = 10;
+
+if false then
+  x = 1;
+  let y = 10;
+elseif true then
+  x = 2;
+else then
+  x = 3;
+endif
