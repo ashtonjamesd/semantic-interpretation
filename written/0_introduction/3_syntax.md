@@ -2,7 +2,7 @@
 
 Programming languages have rules that must be followed in order to build a working program in that language. The language may consist of words, numbers, and symbols that must be correctly structured for the program to be considered valid and able to execute.
 
-A language may be written such that certain words are built-in and considered part of the language syntax. Examples of this are the `for` and `while` keywords in C, which both symbolise the start of a loop control flow statement. These are known as reserved words and cannot be used as identifiers (such as variable or function names).
+A language may be written such that certain words are built-in and considered part of the language syntax. Examples of this are the `for` and `while` keywords in C, which both symbolize the start of a loop control flow statement. These are known as reserved words and cannot be used as identifiers (such as variable or function names).
 
 The primary goal of syntax is to enforce a standard procedure of writing code in a specific language. It ensures that code can be understood by the computer and executed without errors. If a programmer writes code that contains invalid characters or something against the language rules (syntactically invalid), then a syntax error will occur, preventing the program from running.
 
@@ -23,7 +23,7 @@ if (isNull) {
 }
 ```
 
-This will be tokenized into the following: `if` `(` `isNull` `)` `{` `return` `;` `}`. In this example, the `if` and `return` are keywords as they operate with the behaviour and flow of the language itself. These tokens will then be passed to the next stage of the interpretation process - the parser.
+This will be tokenized into the following: `if` `(` `isNull` `)` `{` `return` `;` `}`. In this example, the `if` and `return` are keywords as they operate with the behavior and flow of the language itself. These tokens will then be passed to the next stage of the interpretation process - the parser.
 
 While the lexer performs syntax checks, it primarily focuses on identifying where specific characters are expected to appear, whereas the parser is responsible for recognizing and organizing specific tokens based on the grammar of the language. For instance, take the following example.
 
